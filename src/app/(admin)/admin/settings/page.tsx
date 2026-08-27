@@ -5,6 +5,11 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminSettingsPage() {
   const s = await getSettings();
+  const ann = (s.announcement ?? {}) as {
+    enabled?: boolean;
+    title?: string;
+    message?: string;
+  };
 
   return (
     <div className="mx-auto max-w-3xl space-y-5">
@@ -20,6 +25,9 @@ export default async function AdminSettingsPage() {
           reseller_discount_percentage: Number(s.reseller_discount_percentage ?? 0),
           maintenance_mode: Boolean(s.maintenance_mode ?? false),
           orders_enabled: Boolean(s.orders_enabled ?? true),
+          announcement_enabled: Boolean(ann.enabled ?? false),
+          announcement_title: String(ann.title ?? ""),
+          announcement_message: String(ann.message ?? ""),
         }}
       />
     </div>

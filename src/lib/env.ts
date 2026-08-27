@@ -19,6 +19,7 @@ export const serverEnv = {
   paymentProvider: process.env.PAYMENT_PROVIDER ?? "mock",
   paymentWebhookSecret: process.env.PAYMENT_WEBHOOK_SECRET ?? "",
   mercadoPagoToken: process.env.MERCADOPAGO_ACCESS_TOKEN ?? "",
+  mercadoPagoWebhookSecret: process.env.MERCADOPAGO_WEBHOOK_SECRET ?? "",
   asaasKey: process.env.ASAAS_API_KEY ?? "",
 };
 

@@ -4,6 +4,7 @@ export interface CreatePixInput {
   userId: string;
   amount: number;
   description?: string;
+  payerEmail?: string;
 }
 
 export interface PixCharge {

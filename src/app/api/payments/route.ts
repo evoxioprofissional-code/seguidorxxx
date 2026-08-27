@@ -41,7 +41,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: `Depósito mínimo: R$ ${min}.` }, { status: 400 });
 
   const gateway = getGateway();
-  const charge = await gateway.createPix({ userId: user.id, amount: parsed.data.amount });
+  let charge;
+  try {
+    charge = await gateway.createPix({
+      userId: user.id,
+      amount: parsed.data.amount,
+      payerEmail: user.email ?? undefined,
+    });
+  } catch {
+    return NextResponse.json(
+      { error: "Não foi possível gerar o pagamento. Tente novamente." },
+      { status: 502 }
+    );
+  }
 
   const { data: payment, error } = await admin
     .from("payments")

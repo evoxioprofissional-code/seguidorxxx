@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Copy, QrCode, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -31,6 +31,34 @@ export function DepositPanel({
   const [loading, setLoading] = useState(false);
   const [charge, setCharge] = useState<Charge | null>(null);
   const [confirming, setConfirming] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Fluxo real (Mercado Pago): faz polling do status até aprovar.
+  useEffect(() => {
+    if (isMock || !open || !charge) return;
+    pollRef.current = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/payments/${charge.id}/status`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.status === "approved") {
+          if (pollRef.current) clearInterval(pollRef.current);
+          toast.success("Pagamento confirmado! Saldo creditado.");
+          setOpen(false);
+          setCharge(null);
+          router.refresh();
+        } else if (["expired", "canceled"].includes(data.status)) {
+          if (pollRef.current) clearInterval(pollRef.current);
+          toast.error("O pagamento expirou ou foi cancelado.");
+        }
+      } catch {
+        /* ignora falhas de polling */
+      }
+    }, 4000);
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [isMock, open, charge, router]);
 
   async function generate() {
     if (amount < minDeposit) {

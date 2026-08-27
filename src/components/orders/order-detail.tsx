@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { RefreshCw, RotateCcw, XCircle, Check } from "lucide-react";
+import { RefreshCw, RotateCcw, XCircle, Check, Clock, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/badge";
@@ -100,6 +100,12 @@ export function OrderDetail({ order: initial }: { order: Order }) {
   const canCancel = order.has_cancel && ["pending", "processing"].includes(order.status);
   const canSync = OPEN_STATUSES.includes(order.status);
 
+  // Aviso pro cliente ansioso: enquanto está em andamento, tranquiliza —
+  // e se estiver demorando mais que o normal, reforça que vai chegar.
+  const isOpen = ["pending", "submitting", "processing", "partial"].includes(order.status);
+  const ageMin = (Date.now() - new Date(order.created_at).getTime()) / 60000;
+  const isDelayed = isOpen && ageMin > 30;
+
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       {/* header */}
@@ -136,6 +142,44 @@ export function OrderDetail({ order: initial }: { order: Order }) {
           </div>
         )}
       </div>
+
+      {/* aviso de acompanhamento pro cliente */}
+      {isOpen && (
+        <div
+          className={
+            "flex items-start gap-3 rounded-xl border p-4 " +
+            (isDelayed
+              ? "border-warning/30 bg-warning/10"
+              : "border-primary/25 bg-primary/10")
+          }
+        >
+          {isDelayed ? (
+            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-warning" />
+          ) : (
+            <Clock className="mt-0.5 h-5 w-5 shrink-0 text-primary-soft" />
+          )}
+          <div className="text-sm">
+            {isDelayed ? (
+              <>
+                <p className="font-medium text-fg">Está levando um pouco mais que o normal</p>
+                <p className="mt-1 text-fg-muted">
+                  Em momentos de alta demanda a entrega pode atrasar um pouco, mas fique
+                  tranquilo: seu pedido está <b>garantido</b> e será entregue. Não precisa
+                  refazer nem pagar de novo. 💜
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="font-medium text-fg">Pedido em andamento</p>
+                <p className="mt-1 text-fg-muted">
+                  Já estamos processando. Costuma chegar rapidinho — acompanhe o progresso
+                  aqui mesmo.
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* detalhes */}
       <div className="card divide-y divide-border">

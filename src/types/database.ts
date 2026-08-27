@@ -77,6 +77,7 @@ export type Service = {
   platform: string | null;
   provider_cost: number;
   sale_price: number;
+  min_sale_price: number;
   pricing_mode: PricingMode;
   markup_percentage: number;
   multiplier: number;

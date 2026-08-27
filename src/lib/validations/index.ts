@@ -52,6 +52,7 @@ export const adminServiceUpdateSchema = z.object({
   platform: z.string().trim().max(60).nullable().optional(),
   pricing_mode: z.enum(["manual", "markup", "multiplier"]).optional(),
   sale_price: z.coerce.number().min(0).optional(),
+  min_sale_price: z.coerce.number().min(0).optional(),
   markup_percentage: z.coerce.number().min(0).max(100000).optional(),
   multiplier: z.coerce.number().min(0).max(1000).optional(),
   minimum_margin_percentage: z.coerce.number().min(0).max(100000).optional(),

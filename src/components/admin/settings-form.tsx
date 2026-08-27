@@ -16,6 +16,8 @@ interface Settings {
   announcement_enabled: boolean;
   announcement_title: string;
   announcement_message: string;
+  bonus_enabled: boolean;
+  bonus_tiers: { min: number; followers: number }[];
 }
 
 export function SettingsForm({ initial }: { initial: Settings }) {
@@ -45,6 +47,10 @@ export function SettingsForm({ initial }: { initial: Settings }) {
             title: form.announcement_title,
             message: form.announcement_message,
           },
+          bonus_enabled: form.bonus_enabled,
+          deposit_bonuses: form.bonus_tiers
+            .map((t) => ({ min: Number(t.min), followers: Number(t.followers) }))
+            .filter((t) => t.min > 0 && t.followers > 0),
         }),
       });
       if (res.ok) {
@@ -137,6 +143,65 @@ export function SettingsForm({ initial }: { initial: Settings }) {
               tinha fechado.
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Bônus por depósito */}
+      <div className="card p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold">Bônus por depósito</h2>
+            <p className="text-sm text-fg-muted">
+              Cliente ganha seguidores grátis ao depositar. Ele resgata informando o @.
+            </p>
+          </div>
+          <button
+            onClick={() => set("bonus_enabled", !form.bonus_enabled)}
+            className={
+              "relative h-6 w-11 shrink-0 rounded-full transition-colors " +
+              (form.bonus_enabled ? "bg-primary" : "bg-surface-3")
+            }
+          >
+            <span
+              className={
+                "absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform " +
+                (form.bonus_enabled ? "translate-x-5" : "translate-x-0.5")
+              }
+            />
+          </button>
+        </div>
+
+        <div className="mt-4 space-y-2">
+          {form.bonus_tiers.map((t, i) => (
+            <div key={i} className="grid grid-cols-2 gap-3">
+              <Input
+                label={i === 0 ? "Depósito (R$)" : undefined}
+                type="number"
+                value={t.min}
+                onChange={(e) => {
+                  const tiers = [...form.bonus_tiers];
+                  tiers[i] = { ...tiers[i], min: Number(e.target.value) };
+                  set("bonus_tiers", tiers);
+                }}
+              />
+              <Input
+                label={i === 0 ? "Seguidores grátis" : undefined}
+                type="number"
+                value={t.followers}
+                onChange={(e) => {
+                  const tiers = [...form.bonus_tiers];
+                  tiers[i] = { ...tiers[i], followers: Number(e.target.value) };
+                  set("bonus_tiers", tiers);
+                }}
+              />
+            </div>
+          ))}
+          <button
+            onClick={() => set("bonus_tiers", [...form.bonus_tiers, { min: 0, followers: 0 }])}
+            className="text-sm text-primary-soft hover:underline"
+          >
+            + Adicionar faixa
+          </button>
         </div>
       </div>
 

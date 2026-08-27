@@ -10,6 +10,10 @@ export default async function AdminSettingsPage() {
     title?: string;
     message?: string;
   };
+  const tiers = (Array.isArray(s.deposit_bonuses) ? s.deposit_bonuses : []) as {
+    min: number;
+    followers: number;
+  }[];
 
   return (
     <div className="mx-auto max-w-3xl space-y-5">
@@ -28,6 +32,8 @@ export default async function AdminSettingsPage() {
           announcement_enabled: Boolean(ann.enabled ?? false),
           announcement_title: String(ann.title ?? ""),
           announcement_message: String(ann.message ?? ""),
+          bonus_enabled: Boolean(s.bonus_enabled ?? true),
+          bonus_tiers: tiers.length ? tiers : [{ min: 30, followers: 1000 }],
         }}
       />
     </div>

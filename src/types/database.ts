@@ -123,7 +123,7 @@ export type Order = {
   has_refill: boolean;
   has_cancel: boolean;
   service_name: string | null;
-  source: "web" | "api";
+  source: "web" | "api" | "bonus";
   idempotency_key: string | null;
   created_at: string;
   updated_at: string;
@@ -170,6 +170,19 @@ export type AppSetting = {
   updated_at: string;
 }
 
+export type BonusGrant = {
+  id: string;
+  user_id: string;
+  followers: number;
+  service_id: string | null;
+  payment_id: string | null;
+  status: "pending" | "delivered" | "failed";
+  link: string | null;
+  order_id: string | null;
+  created_at: string;
+  delivered_at: string | null;
+}
+
 type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
   Row: Row;
   Insert: Insert;
@@ -191,6 +204,7 @@ export type Database = {
       provider_logs: Table<ProviderLog>;
       app_settings: Table<AppSetting>;
       api_keys: Table<ApiKey>;
+      bonus_grants: Table<BonusGrant>;
     };
     Views: Record<string, never>;
     Functions: {

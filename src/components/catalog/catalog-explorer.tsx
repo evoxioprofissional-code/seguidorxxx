@@ -247,9 +247,13 @@ export function CatalogExplorer({
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-fg">{svc.name}</p>
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
-                    {svc.featured ? (
+                    {svc.speedLabel ? (
+                      <Badge color="success">
+                        <Zap className="h-3 w-3" /> {svc.speedLabel}
+                      </Badge>
+                    ) : svc.featured ? (
                       <Badge color="warning">
-                        <Zap className="h-3 w-3" /> Rápido · Recomendado
+                        <Zap className="h-3 w-3" /> Recomendado
                       </Badge>
                     ) : (
                       <Badge color="primary">

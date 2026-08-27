@@ -10,6 +10,7 @@ const ALLOWED = [
   "orders_enabled",
   "reseller_discount_percentage",
   "announcement",
+  "speed_tiers",
 ];
 
 export async function PATCH(request: Request) {

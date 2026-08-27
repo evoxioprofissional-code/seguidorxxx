@@ -247,9 +247,15 @@ export function CatalogExplorer({
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-fg">{svc.name}</p>
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
-                    <Badge color="primary">
-                      <Zap className="h-3 w-3" /> Início rápido
-                    </Badge>
+                    {svc.featured ? (
+                      <Badge color="warning">
+                        <Zap className="h-3 w-3" /> Rápido · Recomendado
+                      </Badge>
+                    ) : (
+                      <Badge color="primary">
+                        <Zap className="h-3 w-3" /> Início rápido
+                      </Badge>
+                    )}
                     {svc.hasRefill && (
                       <Badge color="success">
                         <RefreshCw className="h-3 w-3" /> Reposição

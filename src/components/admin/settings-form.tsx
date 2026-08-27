@@ -13,6 +13,9 @@ interface Settings {
   reseller_discount_percentage: number;
   maintenance_mode: boolean;
   orders_enabled: boolean;
+  announcement_enabled: boolean;
+  announcement_title: string;
+  announcement_message: string;
 }
 
 export function SettingsForm({ initial }: { initial: Settings }) {
@@ -37,6 +40,11 @@ export function SettingsForm({ initial }: { initial: Settings }) {
           reseller_discount_percentage: Number(form.reseller_discount_percentage),
           maintenance_mode: form.maintenance_mode,
           orders_enabled: form.orders_enabled,
+          announcement: {
+            enabled: form.announcement_enabled,
+            title: form.announcement_title,
+            message: form.announcement_message,
+          },
         }),
       });
       if (res.ok) {
@@ -80,6 +88,56 @@ export function SettingsForm({ initial }: { initial: Settings }) {
           on={form.maintenance_mode}
           onChange={(v) => set("maintenance_mode", v)}
         />
+      </div>
+
+      {/* Aviso / popup para os clientes */}
+      <div className="card p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold">Aviso no site (popup)</h2>
+            <p className="text-sm text-fg-muted">
+              Aparece pros clientes ao entrar no painel. Use para avisar sobre lentidão,
+              serviços recomendados, manutenção, etc.
+            </p>
+          </div>
+          <button
+            onClick={() => set("announcement_enabled", !form.announcement_enabled)}
+            className={
+              "relative h-6 w-11 shrink-0 rounded-full transition-colors " +
+              (form.announcement_enabled ? "bg-primary" : "bg-surface-3")
+            }
+          >
+            <span
+              className={
+                "absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform " +
+                (form.announcement_enabled ? "translate-x-5" : "translate-x-0.5")
+              }
+            />
+          </button>
+        </div>
+
+        <div className="mt-4 space-y-3">
+          <Input
+            label="Título"
+            value={form.announcement_title}
+            onChange={(e) => set("announcement_title", e.target.value)}
+            placeholder="⚡ Velocidade atualizada"
+          />
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-fg-muted">Mensagem</label>
+            <textarea
+              value={form.announcement_message}
+              onChange={(e) => set("announcement_message", e.target.value)}
+              rows={5}
+              className="w-full rounded-xl border border-border bg-surface-2 px-4 py-2.5 text-sm outline-none focus:border-primary"
+              placeholder={"Instagram atualizou hoje e alguns serviços estão mais lentos.\n\nRecomendados (início rápido): Seguidores Instagram Emergencial.\n\nSe tiver pedido travado, solicite cancelamento no suporte."}
+            />
+            <p className="mt-1 text-xs text-fg-subtle">
+              Quebras de linha são mantidas. Ao mudar o texto, o popup reaparece pra quem já
+              tinha fechado.
+            </p>
+          </div>
+        </div>
       </div>
 
       <Button onClick={save} loading={saving}>Salvar configurações</Button>

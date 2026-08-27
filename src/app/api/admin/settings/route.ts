@@ -9,6 +9,7 @@ const ALLOWED = [
   "maintenance_mode",
   "orders_enabled",
   "reseller_discount_percentage",
+  "announcement",
 ];
 
 export async function PATCH(request: Request) {

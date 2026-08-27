@@ -1,0 +1,184 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   SeguidorX — Design System
+   Dark premium SaaS. Grafite + roxo vibrante. Glassmorphism leve.
+--------------------------------------------------------------------------- */
+
+:root {
+  /* Base surfaces (grafite/preto) */
+  --bg: #07070a;
+  --bg-soft: #0d0d12;
+  --surface: #121218;
+  --surface-2: #17171f;
+  --surface-3: #1e1e28;
+  --border: #26262f;
+  --border-soft: #1c1c24;
+
+  /* Text */
+  --fg: #f4f4f6;
+  --fg-muted: #a1a1ad;
+  --fg-subtle: #6c6c7a;
+
+  /* Roxo vibrante — cor principal */
+  --primary: #8b5cf6;
+  --primary-strong: #7c3aed;
+  --primary-soft: #a78bfa;
+  --primary-glow: rgba(139, 92, 246, 0.45);
+  --primary-ghost: rgba(139, 92, 246, 0.12);
+
+  /* Status */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  --pending: #eab308;
+
+  --radius: 0.85rem;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+
+  --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-primary-soft: var(--primary-soft);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-pending: var(--pending);
+
+  --radius-xl: var(--radius);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Ambient radial glow behind the app */
+.app-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 12% -10%, rgba(124, 58, 237, 0.14), transparent 60%),
+    radial-gradient(50rem 40rem at 100% 0%, rgba(139, 92, 246, 0.10), transparent 55%),
+    radial-gradient(40rem 40rem at 50% 120%, rgba(88, 28, 135, 0.10), transparent 60%);
+}
+
+/* Glassmorphism */
+.glass {
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* Purple gradient text */
+.text-gradient {
+  background: linear-gradient(100deg, #c4b5fd 0%, #8b5cf6 45%, #6d28d9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Glow button ring */
+.glow {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 40%, transparent),
+    0 8px 30px -8px var(--primary-glow);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--surface-3);
+  border-radius: 999px;
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2e2e3a;
+}
+
+/* Shimmer skeleton */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--fg) 6%, transparent),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-in {
+  animation: fade-in-up 0.4s ease both;
+}
+
+/* Focus */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}

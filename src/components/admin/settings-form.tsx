@@ -127,7 +127,7 @@ export function SettingsForm({ initial }: { initial: Settings }) {
             label="Título"
             value={form.announcement_title}
             onChange={(e) => set("announcement_title", e.target.value)}
-            placeholder="⚡ Velocidade atualizada"
+            placeholder="Velocidade atualizada"
           />
           <div>
             <label className="mb-1.5 block text-sm font-medium text-fg-muted">Mensagem</label>

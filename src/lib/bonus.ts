@@ -102,7 +102,7 @@ export async function claimBonus(
       provider_cost: providerCost,
       profit: -providerCost,
       status: "submitting",
-      service_name: `🎁 Bônus — ${service.custom_name ?? "Seguidores"}`,
+      service_name: `Bônus — ${service.custom_name ?? "Seguidores"}`,
       source: "bonus",
       has_refill: service.has_refill,
       has_cancel: service.has_cancel,

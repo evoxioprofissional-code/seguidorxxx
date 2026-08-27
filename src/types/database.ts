@@ -67,8 +67,19 @@ export type ProviderService = {
   last_synced_at: string;
 }
 
+export type ApiKey = {
+  id: string;
+  user_id: string;
+  key: string;
+  label: string | null;
+  active: boolean;
+  created_at: string;
+  last_used_at: string | null;
+};
+
 export type Service = {
   id: string;
+  code: number;
   provider: string;
   provider_service_id: string;
   custom_name: string | null;
@@ -112,6 +123,7 @@ export type Order = {
   has_refill: boolean;
   has_cancel: boolean;
   service_name: string | null;
+  source: "web" | "api";
   idempotency_key: string | null;
   created_at: string;
   updated_at: string;
@@ -178,6 +190,7 @@ export type Database = {
       payments: Table<Payment>;
       provider_logs: Table<ProviderLog>;
       app_settings: Table<AppSetting>;
+      api_keys: Table<ApiKey>;
     };
     Views: Record<string, never>;
     Functions: {

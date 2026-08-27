@@ -2,7 +2,12 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getProvider } from "@/lib/providers";
 import { ProviderError } from "@/lib/providers/types";
-import { calculateProviderCost, calculateSalePrice, hasPricingWarning } from "@/lib/pricing";
+import {
+  calculateProviderCost,
+  calculateSalePrice,
+  calculateResellerPrice,
+  hasPricingWarning,
+} from "@/lib/pricing";
 import { platformLabel, categoryLabel } from "@/lib/catalog/taxonomy";
 import type { Order, Service } from "@/types/database";
 
@@ -16,6 +21,10 @@ interface Params {
   link: string;
   quantity: number;
   idempotencyKey: string;
+  /** origem do pedido; 'api' = revendedor via /api/v2 */
+  source?: "web" | "api";
+  /** desconto de revendedor (%) aplicado ao preço quando source='api' */
+  resellerDiscountPct?: number;
 }
 
 /**
@@ -60,8 +69,11 @@ export async function createOrder(params: Params): Promise<CreateOrderResult> {
   if (qty > service.max_quantity)
     return { ok: false, code: "QTY_MAX", message: `Quantidade máxima: ${service.max_quantity}.` };
 
-  // --- preço recalculado no servidor (NUNCA confiar no front) ---
-  const customerPrice = calculateSalePrice(service, qty);
+  // --- preço recalculado no servidor (NUNCA confiar no front/cliente da API) ---
+  const isApi = params.source === "api";
+  const customerPrice = isApi
+    ? calculateResellerPrice(service, qty, params.resellerDiscountPct ?? 0)
+    : calculateSalePrice(service, qty);
   const providerCost = calculateProviderCost(service.provider_cost, qty);
   if (customerPrice <= 0)
     return { ok: false, code: "PRICE_INVALID", message: "Preço inválido para este serviço." };
@@ -97,6 +109,11 @@ export async function createOrder(params: Params): Promise<CreateOrderResult> {
   }
 
   const order = created as unknown as Order;
+
+  // marca origem do pedido (revenda)
+  if (isApi && order.source !== "api") {
+    await admin.from("orders").update({ source: "api" }).eq("id", order.id);
+  }
 
   // Idempotência: se o pedido já tinha sido enviado antes, apenas retorna.
   if (order.provider_order_id && order.status !== "submitting") {

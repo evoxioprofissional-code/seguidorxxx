@@ -10,6 +10,7 @@ interface Settings {
   minimum_deposit: number;
   minimum_margin: number;
   provider_low_balance_threshold: number;
+  reseller_discount_percentage: number;
   maintenance_mode: boolean;
   orders_enabled: boolean;
 }
@@ -33,6 +34,7 @@ export function SettingsForm({ initial }: { initial: Settings }) {
           minimum_deposit: Number(form.minimum_deposit),
           minimum_margin: Number(form.minimum_margin),
           provider_low_balance_threshold: Number(form.provider_low_balance_threshold),
+          reseller_discount_percentage: Number(form.reseller_discount_percentage),
           maintenance_mode: form.maintenance_mode,
           orders_enabled: form.orders_enabled,
         }),
@@ -58,6 +60,10 @@ export function SettingsForm({ initial }: { initial: Settings }) {
             value={form.provider_low_balance_threshold}
             onChange={(e) => set("provider_low_balance_threshold", Number(e.target.value))}
             hint="Avisa no painel quando o saldo do fornecedor ficar abaixo disso." />
+          <Input label="Desconto de revendedor (%)" type="number"
+            value={form.reseller_discount_percentage}
+            onChange={(e) => set("reseller_discount_percentage", Number(e.target.value))}
+            hint="Desconto aplicado no preço para quem compra pela API. 0 = mesmo preço do varejo." />
         </div>
       </div>
 

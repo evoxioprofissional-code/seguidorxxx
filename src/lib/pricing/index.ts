@@ -93,6 +93,25 @@ export function hasPricingWarning(
   return false;
 }
 
+/** Preço por 1000 para revendedor (aplica desconto global sobre o varejo). */
+export function resellerPricePer1000(
+  service: PricingInput,
+  discountPct: number
+): number {
+  const retail = computeSalePricePer1000(service);
+  const d = Math.max(0, Math.min(100, Number(discountPct) || 0));
+  return round(retail * (1 - d / 100), 2);
+}
+
+/** Preço final revendedor para uma quantidade (BRL). */
+export function calculateResellerPrice(
+  service: PricingInput,
+  quantity: number,
+  discountPct: number
+): number {
+  return round((resellerPricePer1000(service, discountPct) * quantity) / RATE_UNIT, 2);
+}
+
 /** Lucro por 1000 (BRL). */
 export function profitPer1000(service: PricingInput): number {
   return round(computeSalePricePer1000(service) - (Number(service.provider_cost) || 0), 2);

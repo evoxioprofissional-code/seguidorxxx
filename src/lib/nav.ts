@@ -7,6 +7,7 @@ import {
   Users,
   Settings,
   Plug,
+  Code2,
   type LucideIcon,
 } from "lucide-react";
 
@@ -21,6 +22,7 @@ export const userNav: NavItem[] = [
   { href: "/services", label: "Comprar", icon: ShoppingBag },
   { href: "/orders", label: "Pedidos", icon: ListOrdered },
   { href: "/wallet", label: "Carteira", icon: Wallet },
+  { href: "/integracao", label: "API", icon: Code2 },
 ];
 
 export const adminNav: NavItem[] = [

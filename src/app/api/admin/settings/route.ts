@@ -8,6 +8,7 @@ const ALLOWED = [
   "provider_low_balance_threshold",
   "maintenance_mode",
   "orders_enabled",
+  "reseller_discount_percentage",
 ];
 
 export async function PATCH(request: Request) {

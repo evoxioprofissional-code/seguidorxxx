@@ -25,12 +25,15 @@ export interface CategoryDef {
   keywords: string[];
 }
 
+// ATENÇÃO: a ordem importa. "seguidores" fica por ÚLTIMO porque o campo
+// "category" do fornecedor é um balaio que cita "Seguidores" em quase tudo.
+// Detectar categoria SEMPRE pelo NOME do serviço, nunca pelo balaio.
 export const CATEGORIES: CategoryDef[] = [
-  { id: "seguidores", label: "Seguidores", keywords: ["follower", "seguidor", "subscriber", "inscrito", "member", "membro"] },
-  { id: "curtidas", label: "Curtidas", keywords: ["like", "curtida", "reaction", "reação"] },
-  { id: "visualizacoes", label: "Visualizações", keywords: ["view", "visualiz", "play", "watch", "impress"] },
-  { id: "comentarios", label: "Comentários", keywords: ["comment", "comentário", "comentario"] },
-  { id: "compartilhamentos", label: "Compartilhamentos", keywords: ["share", "compartilh", "repost", "retweet", "save", "salvamento"] },
+  { id: "visualizacoes", label: "Visualizações", keywords: ["visualiz", "view", "play", "watch", "assist", "impress", "reprodu"] },
+  { id: "curtidas", label: "Curtidas", keywords: ["curtida", "like", "reaç", "reac"] },
+  { id: "comentarios", label: "Comentários", keywords: ["coment"] },
+  { id: "compartilhamentos", label: "Compartilhamentos", keywords: ["compartilh", "share", "repost", "retweet", "salvamento", "save"] },
+  { id: "seguidores", label: "Seguidores", keywords: ["seguidor", "follower", "inscrit", "subscriber", "member", "membro"] },
   { id: "outros", label: "Outros", keywords: [] },
 ];
 

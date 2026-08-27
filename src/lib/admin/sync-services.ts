@@ -59,8 +59,11 @@ export async function syncServices(providerId = DEFAULT_PROVIDER): Promise<SyncR
     );
 
     const costPer1000 = providerCostPer1000BRL(s.rate, rateFactor);
-    const platform = detectPlatform(s.category, s.name);
-    const category = detectCategory(s.name, s.category);
+    // categoria SÓ pelo nome (o campo category do fornecedor é um balaio ambíguo);
+    // plataforma pelo nome, com o balaio só como fallback.
+    let platform = detectPlatform(s.name);
+    if (platform === "outros") platform = detectPlatform(s.name, s.category);
+    const category = detectCategory(s.name);
 
     // 2. serviço de venda
     const { data: existing } = await admin

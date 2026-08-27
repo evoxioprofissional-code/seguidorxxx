@@ -1,0 +1,117 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+interface Settings {
+  minimum_deposit: number;
+  minimum_margin: number;
+  provider_low_balance_threshold: number;
+  maintenance_mode: boolean;
+  orders_enabled: boolean;
+}
+
+export function SettingsForm({ initial }: { initial: Settings }) {
+  const router = useRouter();
+  const [form, setForm] = useState(initial);
+  const [saving, setSaving] = useState(false);
+
+  function set<K extends keyof Settings>(k: K, v: Settings[K]) {
+    setForm((f) => ({ ...f, [k]: v }));
+  }
+
+  async function save() {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          minimum_deposit: Number(form.minimum_deposit),
+          minimum_margin: Number(form.minimum_margin),
+          provider_low_balance_threshold: Number(form.provider_low_balance_threshold),
+          maintenance_mode: form.maintenance_mode,
+          orders_enabled: form.orders_enabled,
+        }),
+      });
+      if (res.ok) {
+        toast.success("Configurações salvas.");
+        router.refresh();
+      } else toast.error("Falha ao salvar.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="space-y-5">
+      <div className="card space-y-4 p-6">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Input label="Depósito mínimo (R$)" type="number" value={form.minimum_deposit}
+            onChange={(e) => set("minimum_deposit", Number(e.target.value))} />
+          <Input label="Margem mínima global (%)" type="number" value={form.minimum_margin}
+            onChange={(e) => set("minimum_margin", Number(e.target.value))} />
+          <Input label="Alerta de saldo do fornecedor (USD)" type="number"
+            value={form.provider_low_balance_threshold}
+            onChange={(e) => set("provider_low_balance_threshold", Number(e.target.value))}
+            hint="Avisa no painel quando o saldo do fornecedor ficar abaixo disso." />
+        </div>
+      </div>
+
+      <div className="card divide-y divide-border">
+        <ToggleRow
+          label="Pedidos habilitados"
+          desc="Desative para pausar novas compras temporariamente."
+          on={form.orders_enabled}
+          onChange={(v) => set("orders_enabled", v)}
+        />
+        <ToggleRow
+          label="Modo manutenção"
+          desc="Bloqueia a criação de pedidos e sinaliza manutenção."
+          on={form.maintenance_mode}
+          onChange={(v) => set("maintenance_mode", v)}
+        />
+      </div>
+
+      <Button onClick={save} loading={saving}>Salvar configurações</Button>
+    </div>
+  );
+}
+
+function ToggleRow({
+  label,
+  desc,
+  on,
+  onChange,
+}: {
+  label: string;
+  desc: string;
+  on: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between p-5">
+      <div>
+        <p className="font-medium text-fg">{label}</p>
+        <p className="text-sm text-fg-muted">{desc}</p>
+      </div>
+      <button
+        onClick={() => onChange(!on)}
+        className={
+          "relative h-6 w-11 shrink-0 rounded-full transition-colors " +
+          (on ? "bg-primary" : "bg-surface-3")
+        }
+      >
+        <span
+          className={
+            "absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform " +
+            (on ? "translate-x-5" : "translate-x-0.5")
+          }
+        />
+      </button>
+    </div>
+  );
+}

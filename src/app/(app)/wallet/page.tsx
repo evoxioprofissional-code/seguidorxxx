@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowUpRight, Wallet as WalletIcon } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Wallet as WalletIcon, Gift } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getBalance, getSettings } from "@/lib/queries";
 import { isMockPayments } from "@/lib/payments";
@@ -27,6 +27,11 @@ export default async function WalletPage() {
     .limit(50);
   const txs = (data ?? []) as WalletTransaction[];
   const minDeposit = Number(settings.minimum_deposit ?? 10);
+  const bonusEnabled = settings.bonus_enabled !== false;
+  const bonusTiers = (Array.isArray(settings.deposit_bonuses) ? settings.deposit_bonuses : []) as {
+    min: number;
+    followers: number;
+  }[];
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -54,6 +59,35 @@ export default async function WalletPage() {
           </div>
         </div>
       </div>
+
+      {bonusEnabled && bonusTiers.length > 0 && (
+        <div
+          className="rounded-xl border border-primary/30 p-5"
+          style={{ background: "linear-gradient(100deg, rgba(124,58,237,0.16), rgba(139,92,246,0.05))" }}
+        >
+          <div className="flex items-center gap-2 text-primary-soft">
+            <Gift className="h-5 w-5" />
+            <h2 className="font-semibold">Deposite e ganhe seguidores grátis 🎁</h2>
+          </div>
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+            {bonusTiers
+              .slice()
+              .sort((a, b) => Number(a.min) - Number(b.min))
+              .map((t) => (
+                <div key={t.min} className="rounded-lg border border-border bg-surface-2 p-3 text-center">
+                  <p className="text-sm text-fg-muted">Depositando {formatBRL(t.min)}</p>
+                  <p className="mt-0.5 font-bold text-fg">
+                    +{new Intl.NumberFormat("pt-BR").format(t.followers)} seguidores
+                  </p>
+                </div>
+              ))}
+          </div>
+          <p className="mt-3 text-xs text-fg-subtle">
+            O bônus libera automaticamente após o pagamento. Você resgata no início,
+            informando seu @ do Instagram.
+          </p>
+        </div>
+      )}
 
       <DepositPanel minDeposit={minDeposit} isMock={isMockPayments()} />
 

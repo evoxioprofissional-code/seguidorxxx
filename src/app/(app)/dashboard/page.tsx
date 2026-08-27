@@ -9,17 +9,18 @@ import { StatusBadge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatBRL, formatDate, formatNumber } from "@/lib/format";
 import { OPEN_STATUSES } from "@/lib/orders/status";
-import type { Order } from "@/types/database";
+import { BonusCard } from "@/components/bonus/bonus-card";
+import type { Order, BonusGrant } from "@/types/database";
 
 export default async function DashboardPage() {
   const profile = await requireProfile();
   const supabase = await createClient();
   const balance = await getBalance();
 
-  const { data: orders } = await supabase
-    .from("orders")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const [{ data: orders }, { data: bonuses }] = await Promise.all([
+    supabase.from("orders").select("*").order("created_at", { ascending: false }),
+    supabase.from("bonus_grants").select("*").eq("status", "pending"),
+  ]);
 
   const list = (orders ?? []) as Order[];
   const total = list.length;
@@ -44,6 +45,8 @@ export default async function DashboardPage() {
           </Button>
         </Link>
       </div>
+
+      <BonusCard bonuses={(bonuses ?? []) as BonusGrant[]} />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Saldo disponível" value={formatBRL(balance)} icon={Wallet} accent="primary" />

@@ -11,6 +11,8 @@ const ALLOWED = [
   "reseller_discount_percentage",
   "announcement",
   "speed_tiers",
+  "bonus_enabled",
+  "deposit_bonuses",
 ];
 
 export async function PATCH(request: Request) {

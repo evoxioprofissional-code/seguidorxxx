@@ -35,5 +35,13 @@ export async function approvePaymentByExternalId(
     .update({ status: "approved", approved_at: new Date().toISOString() })
     .eq("id", payment.id);
 
+  // bônus por depósito (grátis seguidores). best-effort, não bloqueia o crédito.
+  try {
+    const { grantDepositBonus } = await import("@/lib/bonus");
+    await grantDepositBonus(payment.id);
+  } catch {
+    /* bônus é best-effort */
+  }
+
   return { ok: true };
 }

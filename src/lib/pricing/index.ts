@@ -38,42 +38,35 @@ export function calculateProviderCost(
  * - markup: custo * (1 + markup%/100)
  * - multiplier: custo * multiplicador
  */
-export function computeSalePricePer1000(
-  service: Pick<
-    Service,
-    | "pricing_mode"
-    | "sale_price"
-    | "provider_cost"
-    | "markup_percentage"
-    | "multiplier"
-  >
-): number {
+type PricingInput = Pick<
+  Service,
+  "pricing_mode" | "sale_price" | "provider_cost" | "markup_percentage" | "multiplier"
+> & { min_sale_price?: number | null };
+
+export function computeSalePricePer1000(service: PricingInput): number {
   const mode: PricingMode = service.pricing_mode;
   const cost = Number(service.provider_cost) || 0;
+  let base: number;
   switch (mode) {
     case "manual":
-      return round(Number(service.sale_price) || 0, 2);
+      base = round(Number(service.sale_price) || 0, 2);
+      break;
     case "markup":
-      return round(cost * (1 + (Number(service.markup_percentage) || 0) / 100), 2);
+      base = round(cost * (1 + (Number(service.markup_percentage) || 0) / 100), 2);
+      break;
     case "multiplier":
-      return round(cost * (Number(service.multiplier) || 1), 2);
+      base = round(cost * (Number(service.multiplier) || 1), 2);
+      break;
     default:
-      return round(Number(service.sale_price) || 0, 2);
+      base = round(Number(service.sale_price) || 0, 2);
   }
+  // Piso de preço: nunca vende abaixo de min_sale_price (por 1.000).
+  const floor = Number(service.min_sale_price ?? 0) || 0;
+  return round(Math.max(base, floor), 2);
 }
 
 /** Preço final que o cliente paga por uma quantidade (BRL, 2 casas). */
-export function calculateSalePrice(
-  service: Pick<
-    Service,
-    | "pricing_mode"
-    | "sale_price"
-    | "provider_cost"
-    | "markup_percentage"
-    | "multiplier"
-  >,
-  quantity: number
-): number {
+export function calculateSalePrice(service: PricingInput, quantity: number): number {
   const per1000 = computeSalePricePer1000(service);
   return round((per1000 * quantity) / RATE_UNIT, 2);
 }
@@ -89,15 +82,7 @@ export function marginPercentage(cost: number, sale: number): number {
  * não atingida). Bloqueia novas compras no servidor.
  */
 export function hasPricingWarning(
-  service: Pick<
-    Service,
-    | "pricing_mode"
-    | "sale_price"
-    | "provider_cost"
-    | "markup_percentage"
-    | "multiplier"
-    | "minimum_margin_percentage"
-  >
+  service: PricingInput & Pick<Service, "minimum_margin_percentage">
 ): boolean {
   const cost = Number(service.provider_cost) || 0;
   const sale = computeSalePricePer1000(service);
@@ -109,15 +94,6 @@ export function hasPricingWarning(
 }
 
 /** Lucro por 1000 (BRL). */
-export function profitPer1000(
-  service: Pick<
-    Service,
-    | "pricing_mode"
-    | "sale_price"
-    | "provider_cost"
-    | "markup_percentage"
-    | "multiplier"
-  >
-): number {
+export function profitPer1000(service: PricingInput): number {
   return round(computeSalePricePer1000(service) - (Number(service.provider_cost) || 0), 2);
 }

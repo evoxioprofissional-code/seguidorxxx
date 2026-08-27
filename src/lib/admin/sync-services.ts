@@ -22,7 +22,16 @@ export interface SyncResult {
 export async function syncServices(providerId = DEFAULT_PROVIDER): Promise<SyncResult> {
   const provider = getProvider(providerId);
   const admin = createAdminClient();
-  const usdBrl = serverEnv.usdBrlRate;
+
+  // Detecta a moeda do fornecedor: se já cobra em BRL, não converte (fator 1);
+  // se cobra em USD, converte pela taxa configurada.
+  let rateFactor = 1;
+  try {
+    const bal = await provider.getBalance();
+    rateFactor = bal.currency?.toUpperCase() === "USD" ? serverEnv.usdBrlRate : 1;
+  } catch {
+    rateFactor = 1;
+  }
 
   const list = await provider.getServices();
   let created = 0;
@@ -49,7 +58,7 @@ export async function syncServices(providerId = DEFAULT_PROVIDER): Promise<SyncR
       { onConflict: "provider,provider_service_id" }
     );
 
-    const costPer1000 = providerCostPer1000BRL(s.rate, usdBrl);
+    const costPer1000 = providerCostPer1000BRL(s.rate, rateFactor);
     const platform = detectPlatform(s.category, s.name);
     const category = detectCategory(s.name, s.category);
 
@@ -72,8 +81,9 @@ export async function syncServices(providerId = DEFAULT_PROVIDER): Promise<SyncR
         platform,
         provider_cost: costPer1000,
         sale_price: 0,
+        min_sale_price: 7.5,
         pricing_mode: "markup" as const,
-        markup_percentage: 100,
+        markup_percentage: 175,
         multiplier: 2,
         minimum_margin_percentage: 0,
         min_quantity: s.min || 10,

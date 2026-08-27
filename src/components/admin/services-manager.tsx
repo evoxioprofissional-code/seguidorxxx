@@ -226,6 +226,7 @@ function EditModal({
     category: service.category ?? "outros",
     pricing_mode: service.pricing_mode,
     sale_price: service.sale_price,
+    min_sale_price: service.min_sale_price,
     markup_percentage: service.markup_percentage,
     multiplier: service.multiplier,
     minimum_margin_percentage: service.minimum_margin_percentage,
@@ -241,6 +242,7 @@ function EditModal({
     provider_cost: service.provider_cost,
     markup_percentage: form.markup_percentage,
     multiplier: form.multiplier,
+    min_sale_price: form.min_sale_price,
   } as Service);
 
   function set<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
@@ -268,6 +270,7 @@ function EditModal({
                 category: form.category,
                 pricing_mode: form.pricing_mode,
                 sale_price: Number(form.sale_price),
+                min_sale_price: Number(form.min_sale_price),
                 markup_percentage: Number(form.markup_percentage),
                 multiplier: Number(form.multiplier),
                 minimum_margin_percentage: Number(form.minimum_margin_percentage),
@@ -330,6 +333,16 @@ function EditModal({
               <Input label="Multiplicador (x)" type="number" step="0.1" value={form.multiplier}
                 onChange={(e) => set("multiplier", Number(e.target.value))} />
             )}
+          </div>
+
+          <div className="mt-3">
+            <Input
+              label="Piso de preço / 1.000 (R$) — nunca vende abaixo disso"
+              type="number"
+              step="0.01"
+              value={form.min_sale_price}
+              onChange={(e) => set("min_sale_price", Number(e.target.value))}
+            />
           </div>
 
           <div className="mt-3 flex items-center justify-between rounded-lg bg-surface p-3 text-sm">

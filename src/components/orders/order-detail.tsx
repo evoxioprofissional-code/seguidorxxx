@@ -165,7 +165,7 @@ export function OrderDetail({ order: initial }: { order: Order }) {
                 <p className="mt-1 text-fg-muted">
                   Em momentos de alta demanda a entrega pode atrasar um pouco, mas fique
                   tranquilo: seu pedido está <b>garantido</b> e será entregue. Não precisa
-                  refazer nem pagar de novo. 💜
+                  refazer nem pagar de novo.
                 </p>
               </>
             ) : (

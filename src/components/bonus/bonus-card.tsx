@@ -31,7 +31,7 @@ export function BonusCard({ bonuses }: { bonuses: BonusGrant[] }) {
       });
       const data = await res.json();
       if (res.ok) {
-        toast.success("Bônus resgatado! Seus seguidores já estão a caminho. 🎉");
+        toast.success("Bônus resgatado! Seus seguidores já estão a caminho.");
         setClaiming(null);
         setLink("");
         router.push(`/orders/${data.orderId}`);
@@ -62,7 +62,7 @@ export function BonusCard({ bonuses }: { bonuses: BonusGrant[] }) {
                   <Gift className="h-6 w-6" />
                 </span>
                 <div>
-                  <p className="text-sm font-medium text-primary-soft">🎁 Bônus liberado!</p>
+                  <p className="text-sm font-medium text-primary-soft">Bônus liberado</p>
                   <p className="text-lg font-bold text-fg">
                     {formatNumber(b.followers)} seguidores grátis no Instagram
                   </p>

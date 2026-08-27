@@ -67,7 +67,7 @@ export default async function WalletPage() {
         >
           <div className="flex items-center gap-2 text-primary-soft">
             <Gift className="h-5 w-5" />
-            <h2 className="font-semibold">Deposite e ganhe seguidores grátis 🎁</h2>
+            <h2 className="font-semibold">Deposite e ganhe seguidores grátis</h2>
           </div>
           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
             {bonusTiers

@@ -103,7 +103,7 @@ export function ServicesManager({ initial }: { initial: Service[] }) {
                   : "border-border bg-surface-2 text-fg-muted hover:text-fg"
               )}
             >
-              {{ all: "Todos", active: "Ativos", inactive: "Inativos", warning: "⚠ Alerta" }[f]}
+              {{ all: "Todos", active: "Ativos", inactive: "Inativos", warning: "Alerta" }[f]}
             </button>
           ))}
         </div>
@@ -300,7 +300,7 @@ function EditModal({
             onChange={(e) => set("custom_description", e.target.value)}
             rows={2}
             className="w-full rounded-xl border border-border bg-surface-2 px-4 py-2.5 text-sm outline-none focus:border-primary"
-            placeholder="🇧🇷 Brasileiros · ⚡ Início rápido"
+            placeholder="Brasileiros · Início rápido"
           />
         </div>
 

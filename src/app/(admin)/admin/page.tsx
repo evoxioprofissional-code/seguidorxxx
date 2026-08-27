@@ -57,7 +57,7 @@ export default async function AdminDashboard() {
               <p className="text-2xl font-bold text-fg">
                 {formatBRL(m.providerBalance)}
                 {m.lowBalance && (
-                  <span className="ml-2 text-sm font-medium text-warning">⚠ Saldo baixo</span>
+                  <span className="ml-2 text-sm font-medium text-warning">Saldo baixo</span>
                 )}
               </p>
             ) : (

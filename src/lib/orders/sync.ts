@@ -52,6 +52,15 @@ export async function syncOrders(orders: Order[]): Promise<number> {
       }
       const { error } = await admin.from("orders").update(patch).eq("id", order.id);
       if (!error) updated += 1;
+
+      // Cancelado pelo fornecedor (não entregou) -> estorna o cliente automaticamente.
+      // refund_order é idempotente: sincronizações repetidas não estornam 2x.
+      if (mapped === "canceled" && order.status !== "refunded") {
+        await admin.rpc("refund_order", {
+          p_order_id: order.id,
+          p_reason: "Estorno automático: pedido cancelado pelo fornecedor",
+        });
+      }
     }
   }
 

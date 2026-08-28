@@ -23,7 +23,7 @@ export default async function ServicesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Comprar serviço</h1>
+        <h1 className="display text-[2rem] leading-none">Comprar serviço</h1>
         <p className="mt-1 text-sm text-fg-muted">
           Escolha a plataforma, o serviço e a quantidade.
         </p>

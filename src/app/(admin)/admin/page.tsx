@@ -22,7 +22,7 @@ export default async function AdminDashboard() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Visão geral</h1>
+        <h1 className="display text-[2rem] leading-none">Visão geral</h1>
         <p className="mt-1 text-sm text-fg-muted">Desempenho da operação em tempo real.</p>
       </div>
 

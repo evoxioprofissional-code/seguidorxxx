@@ -13,7 +13,7 @@ export default async function AdminSpeedPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Velocidade dos serviços</h1>
+        <h1 className="display text-[2rem] leading-none">Velocidade dos serviços</h1>
         <p className="mt-1 text-sm text-fg-muted">
           Destaque os serviços mais rápidos do fornecedor no topo do catálogo.
         </p>

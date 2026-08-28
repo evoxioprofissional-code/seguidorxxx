@@ -18,7 +18,7 @@ export default async function IntegracaoPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">API de Revenda</h1>
+        <h1 className="display text-[2rem] leading-none">API de Revenda</h1>
         <p className="mt-1 text-sm text-fg-muted">
           Integre o SeguidorX no seu próprio site e revenda com sua marca.
         </p>

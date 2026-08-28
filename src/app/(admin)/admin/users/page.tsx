@@ -31,7 +31,7 @@ export default async function AdminUsersPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Usuários</h1>
+        <h1 className="display text-[2rem] leading-none">Usuários</h1>
         <p className="mt-1 text-sm text-fg-muted">{users.length} cadastrados.</p>
       </div>
 

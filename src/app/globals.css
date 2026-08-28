@@ -1,40 +1,45 @@
 @import "tailwindcss";
 
-/* ---------------------------------------------------------------------------
-   SeguidorX — Design System
-   Dark premium SaaS. Grafite + roxo vibrante. Glassmorphism leve.
---------------------------------------------------------------------------- */
+/* ===========================================================================
+   SeguidorX — Design System v2
+   Dark quente + acento laranja. Editorial, sóbrio, alto contraste.
+   Sem gradiente-texto, sem glassmorphism pesado. Identidade própria.
+=========================================================================== */
 
 :root {
-  /* Base surfaces (grafite/preto) */
-  --bg: #07070a;
-  --bg-soft: #0d0d12;
-  --surface: #121218;
-  --surface-2: #17171f;
-  --surface-3: #1e1e28;
-  --border: #26262f;
-  --border-soft: #1c1c24;
+  /* Superfícies — preto quente neutro (não azulado) */
+  --bg: #0b0a0a;
+  --bg-soft: #111010;
+  --surface: #161514;
+  --surface-2: #1c1b1a;
+  --surface-3: #242220;
+  --border: #2a2826;
+  --border-strong: #363330;
 
-  /* Text */
-  --fg: #f4f4f6;
-  --fg-muted: #a1a1ad;
-  --fg-subtle: #6c6c7a;
+  /* Texto */
+  --fg: #f6f4f1;
+  --fg-muted: #a8a29a;
+  --fg-subtle: #736e66;
 
-  /* Roxo vibrante — cor principal */
-  --primary: #8b5cf6;
-  --primary-strong: #7c3aed;
-  --primary-soft: #a78bfa;
-  --primary-glow: rgba(139, 92, 246, 0.45);
-  --primary-ghost: rgba(139, 92, 246, 0.12);
+  /* Acento — laranja quente (energia / crescimento) */
+  --primary: #f26322;
+  --primary-strong: #d94e12;
+  --primary-soft: #ff8a4c;
+  --primary-ghost: rgba(242, 99, 34, 0.12);
 
   /* Status */
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #3b82f6;
-  --pending: #eab308;
+  --success: #34c759;
+  --warning: #f5b301;
+  --danger: #ff453a;
+  --info: #4a9eff;
+  --pending: #f5b301;
 
-  --radius: 0.85rem;
+  --radius: 0.65rem;
+  --radius-lg: 0.85rem;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px -4px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 48px -12px rgba(0, 0, 0, 0.6);
 }
 
 @theme inline {
@@ -44,7 +49,7 @@
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
   --color-border: var(--border);
-  --color-border-soft: var(--border-soft);
+  --color-border-strong: var(--border-strong);
 
   --color-fg: var(--fg);
   --color-fg-muted: var(--fg-muted);
@@ -60,8 +65,8 @@
   --color-info: var(--info);
   --color-pending: var(--pending);
 
-  --radius-xl: var(--radius);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --radius-xl: var(--radius-lg);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
@@ -79,46 +84,61 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  letter-spacing: -0.011em;
 }
 
-/* Ambient radial glow behind the app */
+h1,
+h2,
+h3 {
+  letter-spacing: -0.025em;
+}
+
+/* Fundo: grão sutil + halo discreto, nada de aurora colorida chamativa */
 .app-aurora {
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(60rem 40rem at 12% -10%, rgba(124, 58, 237, 0.14), transparent 60%),
-    radial-gradient(50rem 40rem at 100% 0%, rgba(139, 92, 246, 0.10), transparent 55%),
-    radial-gradient(40rem 40rem at 50% 120%, rgba(88, 28, 135, 0.10), transparent 60%);
+    radial-gradient(70rem 44rem at 50% -20%, rgba(242, 99, 34, 0.07), transparent 60%);
 }
 
-/* Glassmorphism */
-.glass {
-  background: color-mix(in srgb, var(--surface) 72%, transparent);
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
-}
-
+/* Card padrão — borda nítida, sem vidro */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
 }
 
-/* Purple gradient text */
+/* Painel elevado (modais) — leve blur, discreto */
+.panel {
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-lg);
+}
+/* compat: .glass antigo aponta pro novo painel sóbrio */
+.glass {
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-lg);
+}
+
+/* compat: .text-gradient antigo vira cor sólida (sem gradiente-texto de IA) */
 .text-gradient {
-  background: linear-gradient(100deg, #c4b5fd 0%, #8b5cf6 45%, #6d28d9 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--primary);
+}
+.glow {
+  box-shadow: none;
 }
 
-/* Glow button ring */
-.glow {
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 40%, transparent),
-    0 8px 30px -8px var(--primary-glow);
+/* Divisor com rótulo */
+.hairline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
 }
 
 /* Scrollbar */
@@ -135,10 +155,10 @@ body {
   border: 2px solid var(--bg);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2e2e3a;
+  background: var(--border-strong);
 }
 
-/* Shimmer skeleton */
+/* Skeleton */
 .skeleton {
   position: relative;
   overflow: hidden;
@@ -149,12 +169,7 @@ body {
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in srgb, var(--fg) 6%, transparent),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
   animation: shimmer 1.5s infinite;
 }
 @keyframes shimmer {
@@ -174,11 +189,19 @@ body {
   }
 }
 .animate-in {
-  animation: fade-in-up 0.4s ease both;
+  animation: fade-in-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Focus */
 :focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+/* Grid de fundo sutil (hero) */
+.grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 75%);
 }

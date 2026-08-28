@@ -9,17 +9,17 @@ type Size = "sm" | "md" | "lg" | "icon";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-primary text-white hover:bg-primary-strong glow hover:shadow-[0_10px_40px_-8px_var(--primary-glow)]",
-  secondary: "bg-surface-3 text-fg hover:bg-[#2a2a35] border border-border",
-  outline: "border border-border text-fg hover:bg-surface-2",
+    "bg-primary text-white hover:bg-primary-strong shadow-[0_1px_0_rgba(255,255,255,0.15)_inset,0_2px_8px_-2px_rgba(0,0,0,0.4)]",
+  secondary: "bg-surface-2 text-fg border border-border-strong hover:bg-surface-3",
+  outline: "border border-border-strong text-fg hover:bg-surface-2",
   ghost: "text-fg-muted hover:text-fg hover:bg-surface-2",
-  danger: "bg-danger/90 text-white hover:bg-danger",
+  danger: "bg-danger text-white hover:brightness-110",
 };
 
 const sizes: Record<Size, string> = {
-  sm: "h-9 px-3 text-sm rounded-lg",
-  md: "h-11 px-5 text-sm rounded-xl",
-  lg: "h-12 px-7 text-base rounded-xl",
+  sm: "h-9 px-3.5 text-[0.8rem] rounded-lg",
+  md: "h-10 px-5 text-sm rounded-lg",
+  lg: "h-12 px-7 text-[0.95rem] rounded-lg",
   icon: "h-10 w-10 rounded-lg",
 };
 
@@ -40,7 +40,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || loading}
         className={cn(
-          "inline-flex items-center justify-center gap-2 font-medium transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] cursor-pointer",
+          "inline-flex items-center justify-center gap-2 font-medium tracking-tight transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] cursor-pointer",
           variants[variant],
           sizes[size],
           className

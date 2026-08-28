@@ -33,7 +33,7 @@ export default async function ServicesPage() {
         <Link
           href="/wallet"
           className="group flex items-center justify-between gap-4 rounded-xl border border-primary/30 p-4 transition-colors hover:border-primary/50"
-          style={{ background: "linear-gradient(100deg, rgba(124,58,237,0.16), rgba(139,92,246,0.04))" }}
+          style={{ background: "linear-gradient(100deg, rgba(242,99,34,0.16), rgba(242,99,34,0.04))" }}
         >
           <div className="flex items-center gap-3">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary-soft">

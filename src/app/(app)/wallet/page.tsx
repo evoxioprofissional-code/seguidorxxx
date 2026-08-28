@@ -46,7 +46,7 @@ export default async function WalletPage() {
           className="absolute inset-0 -z-10 opacity-60"
           style={{
             background:
-              "radial-gradient(30rem 12rem at 100% 0%, rgba(124,58,237,0.18), transparent 60%)",
+              "radial-gradient(30rem 12rem at 100% 0%, rgba(242,99,34,0.18), transparent 60%)",
           }}
         />
         <div className="flex items-center gap-3">
@@ -63,7 +63,7 @@ export default async function WalletPage() {
       {bonusEnabled && bonusTiers.length > 0 && (
         <div
           className="rounded-xl border border-primary/30 p-5"
-          style={{ background: "linear-gradient(100deg, rgba(124,58,237,0.16), rgba(139,92,246,0.05))" }}
+          style={{ background: "linear-gradient(100deg, rgba(242,99,34,0.16), rgba(242,99,34,0.05))" }}
         >
           <div className="flex items-center gap-2 text-primary-soft">
             <Gift className="h-5 w-5" />

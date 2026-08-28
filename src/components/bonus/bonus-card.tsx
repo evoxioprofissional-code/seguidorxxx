@@ -53,7 +53,7 @@ export function BonusCard({ bonuses }: { bonuses: BonusGrant[] }) {
             className="relative overflow-hidden rounded-xl border border-primary/30 p-5"
             style={{
               background:
-                "linear-gradient(100deg, rgba(124,58,237,0.18), rgba(139,92,246,0.06))",
+                "linear-gradient(100deg, rgba(242,99,34,0.18), rgba(242,99,34,0.06))",
             }}
           >
             <div className="flex flex-wrap items-center justify-between gap-4">

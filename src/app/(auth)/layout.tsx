@@ -13,10 +13,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </Link>
 
         <div className="relative">
-          <h1 className="max-w-md text-[2.6rem] font-semibold leading-[1.08] tracking-tight text-fg">
-            Mais seguidores.
+          <h1 className="display max-w-md text-[3rem] leading-[0.98] text-fg">
+            Cresça nas redes.
             <br />
-            Menos enrolação.
+            <span className="text-primary">Sem enrolação.</span>
           </h1>
           <p className="mt-4 max-w-sm leading-relaxed text-fg-muted">
             Entrega automática, pagamento no Pix e acompanhamento em tempo real. Do jeito

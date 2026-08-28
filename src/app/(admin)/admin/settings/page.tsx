@@ -18,7 +18,7 @@ export default async function AdminSettingsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Configurações</h1>
+        <h1 className="display text-[2rem] leading-none">Configurações</h1>
         <p className="mt-1 text-sm text-fg-muted">Regras gerais da plataforma.</p>
       </div>
       <SettingsForm

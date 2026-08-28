@@ -18,7 +18,7 @@ export default async function AdminIntegrationsPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Integrações</h1>
+        <h1 className="display text-[2rem] leading-none">Integrações</h1>
         <p className="mt-1 text-sm text-fg-muted">Conexão com fornecedores e sincronização.</p>
       </div>
       <IntegrationsPanel

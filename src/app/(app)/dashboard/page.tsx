@@ -31,13 +31,11 @@ export default async function DashboardPage() {
   const firstName = (profile.name ?? "").split(" ")[0] || "por aqui";
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="mx-auto max-w-6xl space-y-8">
+      <div className="flex flex-wrap items-end justify-between gap-4 pt-2">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Olá, {firstName}</h1>
-          <p className="mt-1 text-sm text-fg-muted">
-            Aqui está o resumo da sua conta.
-          </p>
+          <h1 className="display text-[2.2rem] leading-none text-fg">Olá, {firstName}</h1>
+          <p className="mt-2 text-fg-muted">Seu resumo de hoje.</p>
         </div>
         <Link href="/services">
           <Button className="gap-2">

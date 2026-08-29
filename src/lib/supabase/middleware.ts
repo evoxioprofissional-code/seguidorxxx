@@ -7,6 +7,11 @@ const PROTECTED_PREFIXES = ["/dashboard", "/services", "/orders", "/wallet", "/a
 /** Rotas de auth: se logado, redireciona pro dashboard. */
 const AUTH_PREFIXES = ["/login", "/cadastro"];
 
+// Tempo máximo esperando o Supabase Auth responder DENTRO do middleware.
+// Se estourar, tratamos como "sem sessão" para NÃO derrubar o site com 504
+// (MIDDLEWARE_INVOCATION_TIMEOUT da Vercel) quando o Auth ficar lento/travar.
+const AUTH_TIMEOUT_MS = 3000;
+
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -36,9 +41,21 @@ export async function updateSession(request: NextRequest) {
   );
 
   // IMPORTANTE: não colocar lógica entre createServerClient e getUser().
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Corrida com um tempo-limite: se o Auth do Supabase travar/demorar, a Promise
+  // rejeita e seguimos como "sem usuário" (fail-safe), em vez de pendurar até a
+  // Vercel matar o middleware em 25s (MIDDLEWARE_INVOCATION_TIMEOUT / 504).
+  let user = null;
+  try {
+    const { data } = await Promise.race([
+      supabase.auth.getUser(),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("auth-timeout")), AUTH_TIMEOUT_MS)
+      ),
+    ]);
+    user = data.user;
+  } catch {
+    user = null;
+  }
 
   const path = request.nextUrl.pathname;
   const isProtected = PROTECTED_PREFIXES.some((p) => path.startsWith(p));

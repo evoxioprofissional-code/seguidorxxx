@@ -21,19 +21,22 @@ interface Charge {
 export function DepositPanel({
   minDeposit,
   isMock,
+  needsCpf = false,
 }: {
   minDeposit: number;
   isMock: boolean;
+  needsCpf?: boolean;
 }) {
   const router = useRouter();
   const [amount, setAmount] = useState<number>(50);
+  const [cpf, setCpf] = useState("");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [charge, setCharge] = useState<Charge | null>(null);
   const [confirming, setConfirming] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Fluxo real (Mercado Pago): faz polling do status até aprovar.
+  // Fluxo real (Asaas): faz polling do status até aprovar.
   useEffect(() => {
     if (isMock || !open || !charge) return;
     pollRef.current = setInterval(async () => {
@@ -65,12 +68,16 @@ export function DepositPanel({
       toast.error(`Depósito mínimo: ${formatBRL(minDeposit)}.`);
       return;
     }
+    if (needsCpf && cpf.replace(/\D/g, "").length < 11) {
+      toast.error("Informe um CPF ou CNPJ válido.");
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/payments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount }),
+        body: JSON.stringify(needsCpf ? { amount, cpf } : { amount }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -133,6 +140,19 @@ export function DepositPanel({
             </button>
           ))}
         </div>
+
+        {needsCpf && (
+          <div className="mt-4">
+            <Input
+              label="CPF ou CNPJ"
+              inputMode="numeric"
+              placeholder="000.000.000-00"
+              value={cpf}
+              onChange={(e) => setCpf(e.target.value)}
+              hint="Necessário para gerar o PIX. Fica salvo para os próximos depósitos."
+            />
+          </div>
+        )}
 
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
           <div className="flex-1">

@@ -25,13 +25,15 @@ create sequence if not exists public.seguidorx_order_seq start 100000;
 -- profiles
 -- ---------------------------------------------------------------------------
 create table if not exists public.profiles (
-  id          uuid primary key references auth.users(id) on delete cascade,
-  name        text,
-  email       text,
-  role        text not null default 'user' check (role in ('user','admin')),
-  status      text not null default 'active' check (status in ('active','blocked')),
-  created_at  timestamptz not null default now(),
-  updated_at  timestamptz not null default now()
+  id                uuid primary key references auth.users(id) on delete cascade,
+  name              text,
+  email             text,
+  role              text not null default 'user' check (role in ('user','admin')),
+  status            text not null default 'active' check (status in ('active','blocked')),
+  cpf_cnpj          text,
+  asaas_customer_id text,
+  created_at        timestamptz not null default now(),
+  updated_at        timestamptz not null default now()
 );
 create trigger trg_profiles_updated before update on public.profiles
   for each row execute function public.set_updated_at();

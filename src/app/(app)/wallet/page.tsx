@@ -20,6 +20,9 @@ const TX_LABEL: Record<string, string> = {
 export default async function WalletPage() {
   const supabase = await createClient();
   const [balance, settings] = await Promise.all([getBalance(), getSettings()]);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const { data } = await supabase
     .from("wallet_transactions")
     .select("*")
@@ -27,6 +30,17 @@ export default async function WalletPage() {
     .limit(50);
   const txs = (data ?? []) as WalletTransaction[];
   const minDeposit = Number(settings.minimum_deposit ?? 10);
+
+  // CPF só é pedido no gateway real e enquanto o perfil ainda não tiver um salvo.
+  let needsCpf = false;
+  if (!isMockPayments() && user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("cpf_cnpj")
+      .eq("id", user.id)
+      .single();
+    needsCpf = !profile?.cpf_cnpj;
+  }
   const bonusEnabled = settings.bonus_enabled !== false;
   const bonusTiers = (Array.isArray(settings.deposit_bonuses) ? settings.deposit_bonuses : []) as {
     min: number;
@@ -89,7 +103,7 @@ export default async function WalletPage() {
         </div>
       )}
 
-      <DepositPanel minDeposit={minDeposit} isMock={isMockPayments()} />
+      <DepositPanel minDeposit={minDeposit} isMock={isMockPayments()} needsCpf={needsCpf} />
 
       {/* histórico */}
       <div className="card overflow-hidden">

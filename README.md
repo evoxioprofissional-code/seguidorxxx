@@ -73,7 +73,9 @@ Sem a `BARATO_SOCIAIS_API_KEY`, o sistema roda normalmente e o admin mostra **"A
 
 ## Pagamentos
 
-Camada abstrata em `src/lib/payments`. Vem com um gateway **PIX mock** (fallback de dev) — a aprovação é simulada em `/api/payments/[id]/confirm`. Para produção, implemente `PaymentGateway` (Mercado Pago / Asaas) e ajuste `PAYMENT_PROVIDER`; o crédito de saldo acontece só via `/api/payments/webhook`.
+Camada abstrata em `src/lib/payments`. Vem com um gateway **PIX mock** (fallback de dev — a aprovação é simulada em `/api/payments/[id]/confirm`) e o gateway **Asaas** (`src/lib/payments/asaas.ts`) para produção.
+
+Para produção, defina `PAYMENT_PROVIDER=asaas`, `ASAAS_API_KEY` e `PAYMENT_WEBHOOK_SECRET`; o crédito de saldo acontece só via `/api/payments/webhook` (validado pelo header `asaas-access-token`). O Asaas exige CPF/CNPJ do pagador — ele é coletado no primeiro depósito e salvo no perfil (`profiles.cpf_cnpj` / `asaas_customer_id`). No painel do Asaas, cadastre o webhook apontando para `https://SEU_DOMINIO/api/payments/webhook` com o mesmo token de `PAYMENT_WEBHOOK_SECRET`.
 
 ## Cron
 

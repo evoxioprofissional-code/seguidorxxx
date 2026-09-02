@@ -1,16 +1,16 @@
 import "server-only";
 import { serverEnv } from "@/lib/env";
 import { mockGateway } from "./mock";
-import { mercadoPagoGateway } from "./mercadopago";
+import { asaasGateway } from "./asaas";
 import type { PaymentGateway } from "./types";
 
 /**
- * Registro de gateways. Adicionar Asaas/outros aqui quando integrar —
- * cada um implementa PaymentGateway; o resto do sistema não muda.
+ * Registro de gateways. Cada um implementa PaymentGateway; o resto do sistema
+ * não muda ao trocar/adicionar um gateway.
  */
 const registry: Record<string, PaymentGateway> = {
   [mockGateway.id]: mockGateway,
-  [mercadoPagoGateway.id]: mercadoPagoGateway,
+  [asaasGateway.id]: asaasGateway,
 };
 
 export function getGateway(): PaymentGateway {

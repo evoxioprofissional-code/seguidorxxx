@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getGateway } from "@/lib/payments";
-import { depositSchema } from "@/lib/validations";
+import { depositSchema, isValidCpfCnpj, onlyDigits } from "@/lib/validations";
 import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
@@ -41,18 +41,57 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: `Depósito mínimo: R$ ${min}.` }, { status: 400 });
 
   const gateway = getGateway();
+
+  // Perfil: nome + CPF/CNPJ + id de cliente já cadastrado no gateway (reuso).
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("name, cpf_cnpj, asaas_customer_id")
+    .eq("id", user.id)
+    .single();
+
+  // Gateways como o Asaas exigem CPF/CNPJ para gerar a cobrança.
+  const requiresCpf = gateway.id === "asaas";
+  let cpf = profile?.cpf_cnpj ?? null;
+  if (requiresCpf && !cpf) {
+    const provided = parsed.data.cpf ? onlyDigits(parsed.data.cpf) : "";
+    if (!provided)
+      return NextResponse.json(
+        { error: "Informe seu CPF ou CNPJ para gerar o PIX." },
+        { status: 400 }
+      );
+    if (!isValidCpfCnpj(provided))
+      return NextResponse.json({ error: "CPF/CNPJ inválido." }, { status: 400 });
+    cpf = provided;
+  }
+
   let charge;
   try {
     charge = await gateway.createPix({
       userId: user.id,
       amount: parsed.data.amount,
       payerEmail: user.email ?? undefined,
+      payerName: profile?.name ?? undefined,
+      payerCpfCnpj: cpf ?? undefined,
+      asaasCustomerId: profile?.asaas_customer_id ?? undefined,
     });
-  } catch {
+  } catch (err) {
+    // Detalhe fica só no log do servidor (Vercel) — não vaza para o cliente.
+    console.error("[payments] createPix falhou:", err);
     return NextResponse.json(
       { error: "Não foi possível gerar o pagamento. Tente novamente." },
       { status: 502 }
     );
+  }
+
+  // Persiste CPF/CNPJ e o id de cliente do gateway p/ reaproveitar nos próximos.
+  if (requiresCpf) {
+    const patch: { cpf_cnpj?: string; asaas_customer_id?: string } = {};
+    if (cpf && !profile?.cpf_cnpj) patch.cpf_cnpj = cpf;
+    if (charge.customerId && charge.customerId !== profile?.asaas_customer_id)
+      patch.asaas_customer_id = charge.customerId;
+    if (Object.keys(patch).length > 0) {
+      await admin.from("profiles").update(patch).eq("id", user.id);
+    }
   }
 
   const { data: payment, error } = await admin

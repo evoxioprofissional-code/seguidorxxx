@@ -28,6 +28,8 @@ export type Profile = {
   email: string | null;
   role: UserRole;
   status: "active" | "blocked";
+  cpf_cnpj: string | null;
+  asaas_customer_id: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -18,9 +18,9 @@ export const serverEnv = {
   usdBrlRate: Number(process.env.PROVIDER_USD_BRL_RATE ?? "5.60") || 5.6,
   paymentProvider: process.env.PAYMENT_PROVIDER ?? "mock",
   paymentWebhookSecret: process.env.PAYMENT_WEBHOOK_SECRET ?? "",
-  mercadoPagoToken: process.env.MERCADOPAGO_ACCESS_TOKEN ?? "",
-  mercadoPagoWebhookSecret: process.env.MERCADOPAGO_WEBHOOK_SECRET ?? "",
   asaasKey: process.env.ASAAS_API_KEY ?? "",
+  asaasEnv: (process.env.ASAAS_ENV ?? "production").toLowerCase(),
+  asaasApiUrl: process.env.ASAAS_API_URL ?? "",
 };
 
 export function isProviderConfigured(): boolean {

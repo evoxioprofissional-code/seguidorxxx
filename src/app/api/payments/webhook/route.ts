@@ -3,7 +3,7 @@ import { getGateway } from "@/lib/payments";
 import { approvePaymentByExternalId } from "@/lib/payments/approve";
 
 /**
- * Webhook do gateway real (Mercado Pago / Asaas / etc).
+ * Webhook do gateway real (Asaas / etc).
  * O gateway valida a assinatura em parseWebhook(). Só credita saldo aqui.
  */
 export async function POST(request: Request) {

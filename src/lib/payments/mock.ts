@@ -5,7 +5,7 @@ import type { PaymentGateway, CreatePixInput, PixCharge } from "./types";
  * Gateway PIX MOCK — fallback de desenvolvimento.
  * Gera um "copia-e-cola" fictício. A aprovação é simulada pelo endpoint
  * /api/payments/[id]/confirm (que substitui o webhook em dev).
- * NÃO usar em produção — trocar por Mercado Pago / Asaas.
+ * NÃO usar em produção — trocar por Asaas (PAYMENT_PROVIDER=asaas).
  */
 export const mockGateway: PaymentGateway = {
   id: "mock",

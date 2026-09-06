@@ -2,7 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { AdjustBalance } from "@/components/admin/adjust-balance";
+import { UserRoleToggle } from "@/components/admin/user-role-toggle";
 import { StatusBadge, Badge } from "@/components/ui/badge";
 import { formatBRL, formatDateTime } from "@/lib/format";
 import type { Order, Payment, Profile, Wallet, WalletTransaction } from "@/types/database";
@@ -20,6 +22,13 @@ export default async function AdminUserDetail({
   const { data: profile } = await admin.from("profiles").select("*").eq("id", id).single();
   if (!profile) notFound();
   const user = profile as Profile;
+
+  // Conta atualmente logada — para avisar quando o admin edita a si mesmo.
+  const supabase = await createClient();
+  const {
+    data: { user: current },
+  } = await supabase.auth.getUser();
+  const isSelf = current?.id === id;
 
   const [{ data: wallet }, { data: orders }, { data: txs }, { data: payments }] =
     await Promise.all([
@@ -69,8 +78,9 @@ export default async function AdminUserDetail({
       </div>
 
       <div className="grid gap-5 lg:grid-cols-3">
-        <div className="lg:col-span-1">
+        <div className="space-y-5 lg:col-span-1">
           <AdjustBalance userId={id} balance={balance} />
+          <UserRoleToggle userId={id} isAdmin={user.role === "admin"} isSelf={isSelf} />
         </div>
 
         <div className="space-y-5 lg:col-span-2">

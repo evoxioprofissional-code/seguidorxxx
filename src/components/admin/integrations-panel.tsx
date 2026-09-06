@@ -2,14 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { RefreshCw, Plug, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { RefreshCw, Plug, CheckCircle2, XCircle, Loader2, KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { formatBRL, timeAgo } from "@/lib/format";
 
 interface TestResult {
   configured: boolean;
   connected: boolean;
+  source?: "painel" | "env" | null;
+  maskedKey?: string | null;
   balanceBrl?: number;
   currency?: string;
   error?: string;
@@ -26,6 +29,8 @@ export function IntegrationsPanel({
   const [test, setTest] = useState<TestResult | null>(null);
   const [testing, setTesting] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [apiKey, setApiKey] = useState("");
+  const [saving, setSaving] = useState(false);
 
   async function runTest() {
     setTesting(true);
@@ -42,6 +47,37 @@ export function IntegrationsPanel({
   useEffect(() => {
     runTest();
   }, []);
+
+  async function saveKey() {
+    if (!apiKey.trim() && !test?.configured) {
+      toast.error("Cole a chave da API antes de conectar.");
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/provider", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apiKey: apiKey.trim() || undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error ?? "Falha ao salvar.");
+      } else if (data.connected) {
+        toast.success(data.message ? `Conectado! ${data.message}` : "Conectado!");
+        setApiKey("");
+        await runTest();
+        router.refresh();
+      } else {
+        toast.error(data.message ?? "Chave salva, mas a conexão falhou.");
+        await runTest();
+      }
+    } catch {
+      toast.error("Erro de conexão.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   async function sync() {
     setSyncing(true);
@@ -68,6 +104,9 @@ export function IntegrationsPanel({
   ) : test.connected ? (
     <span className="flex items-center gap-2 text-success">
       <CheckCircle2 className="h-4 w-4" /> Conectado
+      {test.source === "env" && (
+        <span className="text-fg-subtle">(via variável de ambiente)</span>
+      )}
     </span>
   ) : (
     <span className="flex items-center gap-2 text-danger">
@@ -89,18 +128,40 @@ export function IntegrationsPanel({
 
       <dl className="divide-y divide-border">
         <Item label="Status" value={statusNode} />
+        {test?.maskedKey && <Item label="Chave" value={<code className="text-xs">{test.maskedKey}</code>} />}
         <Item
           label="Saldo do fornecedor"
           value={
-            test?.connected && test.balanceBrl != null
-              ? formatBRL(test.balanceBrl)
-              : "—"
+            test?.connected && test.balanceBrl != null ? formatBRL(test.balanceBrl) : "—"
           }
         />
         <Item label="Serviços encontrados" value={String(serviceCount)} />
         <Item label="Última sincronização" value={lastSync ? timeAgo(lastSync) : "nunca"} />
         {test?.error && !test.connected && <Item label="Erro" value={test.error} />}
       </dl>
+
+      {/* Conectar / atualizar a chave da API */}
+      <div className="space-y-3 border-t border-border p-5">
+        <div className="flex items-center gap-2 text-sm font-medium text-fg">
+          <KeyRound className="h-4 w-4 text-fg-muted" />
+          Chave da API do fornecedor
+        </div>
+        <Input
+          type="password"
+          autoComplete="off"
+          placeholder={
+            test?.configured
+              ? "Chave já configurada — deixe em branco p/ manter"
+              : "Cole aqui a chave da API da Barato Sociais"
+          }
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value)}
+          hint="Fica guardada com segurança no servidor — nunca aparece aqui inteira."
+        />
+        <Button onClick={saveKey} loading={saving} className="gap-2">
+          <CheckCircle2 className="h-4 w-4" /> Salvar e conectar
+        </Button>
+      </div>
 
       <div className="flex flex-wrap gap-2 border-t border-border p-5">
         <Button variant="secondary" onClick={runTest} loading={testing} className="gap-2">
@@ -110,13 +171,6 @@ export function IntegrationsPanel({
           <RefreshCw className="h-4 w-4" /> Sincronizar serviços
         </Button>
       </div>
-
-      {!test?.configured && !testing && (
-        <div className="border-t border-border bg-warning/5 p-5 text-sm text-fg-muted">
-          Defina <code className="text-warning">BARATO_SOCIAIS_API_KEY</code> no{" "}
-          <code>.env.local</code> para ativar a integração. O restante do sistema funciona normalmente.
-        </div>
-      )}
     </div>
   );
 }

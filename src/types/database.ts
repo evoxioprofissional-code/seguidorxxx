@@ -182,6 +182,15 @@ export type PaymentGatewayRow = {
   updated_at: string;
 }
 
+export type ProviderSettingRow = {
+  id: string;
+  api_key: string | null;
+  api_url: string | null;
+  connected: boolean;
+  account_label: string | null;
+  updated_at: string;
+}
+
 export type BonusGrant = {
   id: string;
   user_id: string;
@@ -218,6 +227,7 @@ export type Database = {
       api_keys: Table<ApiKey>;
       bonus_grants: Table<BonusGrant>;
       payment_gateways: Table<PaymentGatewayRow>;
+      provider_settings: Table<ProviderSettingRow>;
     };
     Views: Record<string, never>;
     Functions: {

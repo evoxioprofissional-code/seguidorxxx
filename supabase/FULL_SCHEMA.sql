@@ -249,6 +249,22 @@ insert into public.app_settings(key, value)
 values ('payment_provider', to_jsonb('asaas'::text))
 on conflict (key) do nothing;
 
+-- ---------------------------------------------------------------------------
+-- provider_settings — credenciais do fornecedor (Barato Sociais)
+-- RLS habilitado e SEM policies => só o backend (service role) acessa.
+-- ---------------------------------------------------------------------------
+create table if not exists public.provider_settings (
+  id            text primary key,            -- 'barato_sociais'
+  api_key       text,
+  api_url       text,
+  connected     boolean not null default false,
+  account_label text,
+  updated_at    timestamptz not null default now()
+);
+alter table public.provider_settings enable row level security;
+create trigger trg_provider_settings_updated before update on public.provider_settings
+  for each row execute function public.set_updated_at();
+
 -- ===========================================================================
 -- SeguidorX — RLS + Trigger de novo usuário + RPCs financeiras atômicas
 -- ===========================================================================

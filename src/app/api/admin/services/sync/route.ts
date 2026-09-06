@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server";
 import { getAdminUser } from "@/lib/admin/guard";
 import { syncServices } from "@/lib/admin/sync-services";
-import { isProviderConfigured } from "@/lib/env";
+import { isProviderConfiguredDb } from "@/lib/providers/config";
+import { DEFAULT_PROVIDER } from "@/lib/providers";
 
 export async function POST() {
   const admin = await getAdminUser();
   if (!admin) return NextResponse.json({ error: "Acesso negado." }, { status: 403 });
 
-  if (!isProviderConfigured())
+  if (!(await isProviderConfiguredDb(DEFAULT_PROVIDER)))
     return NextResponse.json(
-      { error: "API do fornecedor não configurada. Defina BARATO_SOCIAIS_API_KEY." },
+      { error: "API do fornecedor não configurada. Conecte em Integrações." },
       { status: 400 }
     );
 

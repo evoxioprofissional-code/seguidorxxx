@@ -1,6 +1,7 @@
 import "server-only";
 import { serverEnv } from "@/lib/env";
 import { logProvider } from "./logger";
+import { loadProviderCreds } from "./config";
 import {
   Provider,
   ProviderBalance,
@@ -23,12 +24,14 @@ async function call(
   action: string,
   params: Record<string, string | number> = {}
 ): Promise<unknown> {
-  if (!serverEnv.baratoSociaisKey) {
+  // Credenciais do banco (painel admin) com fallback para o env.
+  const { key, url } = await loadProviderCreds(PROVIDER_ID);
+  if (!key) {
     throw new ProviderError("API não configurada", action);
   }
 
   const body = new URLSearchParams();
-  body.set("key", serverEnv.baratoSociaisKey);
+  body.set("key", key);
   body.set("action", action);
   for (const [k, v] of Object.entries(params)) body.set(k, String(v));
 
@@ -37,7 +40,7 @@ async function call(
 
   let response: Response;
   try {
-    response = await fetch(serverEnv.baratoSociaisUrl, {
+    response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: body.toString(),

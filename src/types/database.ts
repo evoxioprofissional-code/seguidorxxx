@@ -26,6 +26,7 @@ export type Profile = {
   id: string;
   name: string | null;
   email: string | null;
+  whatsapp: string | null;
   role: UserRole;
   status: "active" | "blocked";
   cpf_cnpj: string | null;

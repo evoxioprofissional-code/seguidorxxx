@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MessageCircle } from "lucide-react";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { AdjustBalance } from "@/components/admin/adjust-balance";
@@ -57,6 +57,16 @@ export default async function AdminUserDetail({
           <div>
             <h1 className="text-xl font-bold">{user.name ?? "Usuário"}</h1>
             <p className="text-sm text-fg-muted">{user.email}</p>
+            {user.whatsapp && (
+              <a
+                href={`https://wa.me/${waNumber(user.whatsapp)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-0.5 inline-flex items-center gap-1.5 text-sm text-success hover:underline"
+              >
+                <MessageCircle className="h-3.5 w-3.5" /> {user.whatsapp}
+              </a>
+            )}
             <div className="mt-2 flex gap-2">
               {user.role === "admin" && <Badge color="primary">admin</Badge>}
               <Badge color={user.status === "active" ? "success" : "danger"}>
@@ -156,4 +166,10 @@ function Row({
 
 function Empty() {
   return <p className="px-5 py-4 text-sm text-fg-subtle">Nada por aqui.</p>;
+}
+
+/** Monta o número para o wa.me (prefixa 55 quando vem sem código de país). */
+function waNumber(raw: string): string {
+  const d = raw.replace(/\D/g, "");
+  return d.length <= 11 ? `55${d}` : d;
 }

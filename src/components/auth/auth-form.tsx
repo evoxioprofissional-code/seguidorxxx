@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, User } from "lucide-react";
+import { Mail, Lock, User, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -113,6 +113,18 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             autoComplete="name"
             required
             icon={<User className="h-4 w-4" />}
+          />
+        )}
+        {mode === "signup" && (
+          <Input
+            name="whatsapp"
+            type="tel"
+            inputMode="tel"
+            label="WhatsApp"
+            placeholder="(11) 91234-5678"
+            autoComplete="tel"
+            required
+            icon={<Phone className="h-4 w-4" />}
           />
         )}
         <Input

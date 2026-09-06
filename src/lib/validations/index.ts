@@ -9,6 +9,14 @@ export const signupSchema = z.object({
   name: z.string().trim().min(2, "Informe seu nome"),
   email: emailSchema,
   password: passwordSchema,
+  whatsapp: z
+    .string()
+    .trim()
+    .min(1, "Informe seu WhatsApp")
+    .refine((v) => {
+      const d = onlyDigits(v);
+      return d.length >= 10 && d.length <= 13;
+    }, "WhatsApp inválido — inclua o DDD"),
 });
 
 export const loginSchema = z.object({

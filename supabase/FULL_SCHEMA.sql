@@ -28,6 +28,7 @@ create table if not exists public.profiles (
   id                uuid primary key references auth.users(id) on delete cascade,
   name              text,
   email             text,
+  whatsapp          text,
   role              text not null default 'user' check (role in ('user','admin')),
   status            text not null default 'active' check (status in ('active','blocked')),
   cpf_cnpj          text,
@@ -275,11 +276,12 @@ create trigger trg_provider_settings_updated before update on public.provider_se
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  insert into public.profiles (id, name, email)
+  insert into public.profiles (id, name, email, whatsapp)
   values (
     new.id,
     coalesce(new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
-    new.email
+    new.email,
+    new.raw_user_meta_data->>'whatsapp'
   )
   on conflict (id) do nothing;
 

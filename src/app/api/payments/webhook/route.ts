@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import { getGateway } from "@/lib/payments";
+import { getActiveGateway } from "@/lib/payments";
 import { approvePaymentByExternalId } from "@/lib/payments/approve";
 
 /**
- * Webhook do gateway real (Asaas / etc).
+ * Webhook do gateway real (Asaas / Mercado Pago / etc).
  * O gateway valida a assinatura em parseWebhook(). Só credita saldo aqui.
  */
 export async function POST(request: Request) {
-  const gateway = getGateway();
+  const { gateway, creds } = await getActiveGateway();
 
   let payload: unknown;
   try {
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     payload = {};
   }
 
-  const parsed = await gateway.parseWebhook(payload, request.headers);
+  const parsed = await gateway.parseWebhook(payload, request.headers, creds);
   if (!parsed) {
     // assinatura inválida ou gateway sem webhook (mock)
     return NextResponse.json({ received: true }, { status: 200 });

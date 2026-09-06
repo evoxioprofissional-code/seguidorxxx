@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { approvePaymentByExternalId } from "@/lib/payments/approve";
-import { isMockPayments } from "@/lib/payments";
+import { isMockActive } from "@/lib/payments";
 
 /**
  * SIMULAÇÃO de aprovação de pagamento (substitui o webhook em dev/mock).
@@ -12,7 +12,7 @@ export async function POST(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!isMockPayments()) {
+  if (!(await isMockActive())) {
     return NextResponse.json({ error: "Indisponível." }, { status: 403 });
   }
 

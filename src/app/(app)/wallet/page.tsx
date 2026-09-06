@@ -1,7 +1,7 @@
 import { ArrowDownLeft, ArrowUpRight, Wallet as WalletIcon, Gift } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getBalance, getSettings } from "@/lib/queries";
-import { isMockPayments } from "@/lib/payments";
+import { loadPaymentConfig } from "@/lib/payments";
 import { DepositPanel } from "@/components/wallet/deposit-panel";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatBRL, formatDateTime } from "@/lib/format";
@@ -31,9 +31,14 @@ export default async function WalletPage() {
   const txs = (data ?? []) as WalletTransaction[];
   const minDeposit = Number(settings.minimum_deposit ?? 10);
 
-  // CPF só é pedido no gateway real e enquanto o perfil ainda não tiver um salvo.
+  // Gateway ativo (banco/env): define se é mock e se precisa de CPF (Asaas).
+  const { providerId } = await loadPaymentConfig();
+  const isMock = providerId === "mock";
+  const requiresCpf = providerId === "asaas";
+
+  // CPF só é pedido no Asaas e enquanto o perfil ainda não tiver um salvo.
   let needsCpf = false;
-  if (!isMockPayments() && user) {
+  if (requiresCpf && user) {
     const { data: profile } = await supabase
       .from("profiles")
       .select("cpf_cnpj")
@@ -103,7 +108,7 @@ export default async function WalletPage() {
         </div>
       )}
 
-      <DepositPanel minDeposit={minDeposit} isMock={isMockPayments()} needsCpf={needsCpf} />
+      <DepositPanel minDeposit={minDeposit} isMock={isMock} needsCpf={needsCpf} />
 
       {/* histórico */}
       <div className="card overflow-hidden">

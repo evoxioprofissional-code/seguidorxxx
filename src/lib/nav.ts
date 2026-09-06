@@ -9,6 +9,7 @@ import {
   Plug,
   Code2,
   Zap,
+  CreditCard,
   type LucideIcon,
 } from "lucide-react";
 
@@ -33,5 +34,6 @@ export const adminNav: NavItem[] = [
   { href: "/admin/orders", label: "Pedidos", icon: ListOrdered },
   { href: "/admin/users", label: "Usuários", icon: Users },
   { href: "/admin/integrations", label: "Integrações", icon: Plug },
+  { href: "/admin/pagamentos", label: "Pagamentos", icon: CreditCard },
   { href: "/admin/settings", label: "Configurações", icon: Settings },
 ];

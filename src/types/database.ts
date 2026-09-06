@@ -172,6 +172,16 @@ export type AppSetting = {
   updated_at: string;
 }
 
+export type PaymentGatewayRow = {
+  id: string;
+  api_key: string | null;
+  webhook_secret: string | null;
+  extra: Record<string, unknown> | null;
+  connected: boolean;
+  account_label: string | null;
+  updated_at: string;
+}
+
 export type BonusGrant = {
   id: string;
   user_id: string;
@@ -207,6 +217,7 @@ export type Database = {
       app_settings: Table<AppSetting>;
       api_keys: Table<ApiKey>;
       bonus_grants: Table<BonusGrant>;
+      payment_gateways: Table<PaymentGatewayRow>;
     };
     Views: Record<string, never>;
     Functions: {

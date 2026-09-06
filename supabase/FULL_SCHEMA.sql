@@ -228,6 +228,27 @@ insert into public.app_settings(key, value) values
   ('orders_enabled', 'true'::jsonb)
 on conflict (key) do nothing;
 
+-- ---------------------------------------------------------------------------
+-- payment_gateways — credenciais dos gateways (Asaas / Mercado Pago)
+-- RLS habilitado e SEM policies => só o backend (service role) acessa.
+-- ---------------------------------------------------------------------------
+create table if not exists public.payment_gateways (
+  id             text primary key,            -- 'asaas' | 'mercadopago'
+  api_key        text,
+  webhook_secret text,
+  extra          jsonb not null default '{}'::jsonb,
+  connected      boolean not null default false,
+  account_label  text,
+  updated_at     timestamptz not null default now()
+);
+alter table public.payment_gateways enable row level security;
+create trigger trg_payment_gateways_updated before update on public.payment_gateways
+  for each row execute function public.set_updated_at();
+
+insert into public.app_settings(key, value)
+values ('payment_provider', to_jsonb('asaas'::text))
+on conflict (key) do nothing;
+
 -- ===========================================================================
 -- SeguidorX — RLS + Trigger de novo usuário + RPCs financeiras atômicas
 -- ===========================================================================

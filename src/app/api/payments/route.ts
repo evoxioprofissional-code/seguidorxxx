@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getGateway } from "@/lib/payments";
+import { getActiveGateway } from "@/lib/payments";
 import { depositSchema, isValidCpfCnpj, onlyDigits } from "@/lib/validations";
 import { rateLimit } from "@/lib/rate-limit";
 
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
   if (parsed.data.amount < min)
     return NextResponse.json({ error: `Depósito mínimo: R$ ${min}.` }, { status: 400 });
 
-  const gateway = getGateway();
+  const { gateway, creds } = await getActiveGateway();
 
   // Perfil: nome + CPF/CNPJ + id de cliente já cadastrado no gateway (reuso).
   const { data: profile } = await admin
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     .single();
 
   // Gateways como o Asaas exigem CPF/CNPJ para gerar a cobrança.
-  const requiresCpf = gateway.id === "asaas";
+  const requiresCpf = Boolean(gateway.requiresCpf);
   let cpf = profile?.cpf_cnpj ?? null;
   if (requiresCpf && !cpf) {
     const provided = parsed.data.cpf ? onlyDigits(parsed.data.cpf) : "";
@@ -66,14 +66,17 @@ export async function POST(request: Request) {
 
   let charge;
   try {
-    charge = await gateway.createPix({
-      userId: user.id,
-      amount: parsed.data.amount,
-      payerEmail: user.email ?? undefined,
-      payerName: profile?.name ?? undefined,
-      payerCpfCnpj: cpf ?? undefined,
-      asaasCustomerId: profile?.asaas_customer_id ?? undefined,
-    });
+    charge = await gateway.createPix(
+      {
+        userId: user.id,
+        amount: parsed.data.amount,
+        payerEmail: user.email ?? undefined,
+        payerName: profile?.name ?? undefined,
+        payerCpfCnpj: cpf ?? undefined,
+        asaasCustomerId: profile?.asaas_customer_id ?? undefined,
+      },
+      creds
+    );
   } catch (err) {
     // Detalhe fica só no log do servidor (Vercel) — não vaza para o cliente.
     console.error("[payments] createPix falhou:", err);

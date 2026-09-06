@@ -1,6 +1,11 @@
 import "server-only";
-import { serverEnv } from "@/lib/env";
-import type { PaymentGateway, CreatePixInput, PixCharge } from "./types";
+import type {
+  PaymentGateway,
+  CreatePixInput,
+  PixCharge,
+  GatewayCredentials,
+  GatewayTestResult,
+} from "./types";
 
 /**
  * Gateway Asaas — PIX via API de cobranças (/v3).
@@ -8,18 +13,16 @@ import type { PaymentGateway, CreatePixInput, PixCharge } from "./types";
  * Fluxo: cria (ou reaproveita) um cliente -> cria uma cobrança billingType=PIX ->
  * busca o QR Code (copia-e-cola + imagem base64).
  *
- * Credenciais/URL:
- *  - ASAAS_API_KEY   -> header `access_token`
- *  - ASAAS_ENV       -> "production" (padrão) ou "sandbox"
- *  - ASAAS_API_URL   -> opcional, sobrescreve a URL base
- *
- * O webhook (/api/payments/webhook) é validado pelo header `asaas-access-token`
- * comparado com PAYMENT_WEBHOOK_SECRET.
+ * Credenciais (creds) vêm do banco (payment_gateways) ou do env:
+ *  - apiKey        -> header `access_token`
+ *  - env           -> "production" (padrão) ou "sandbox"
+ *  - apiUrl        -> opcional, sobrescreve a URL base
+ *  - webhookSecret -> valida o header `asaas-access-token` do webhook
  */
 
-function baseUrl(): string {
-  if (serverEnv.asaasApiUrl) return serverEnv.asaasApiUrl.replace(/\/+$/, "");
-  return serverEnv.asaasEnv === "sandbox"
+function baseUrl(creds: GatewayCredentials): string {
+  if (creds.apiUrl) return creds.apiUrl.replace(/\/+$/, "");
+  return creds.env === "sandbox"
     ? "https://api-sandbox.asaas.com/v3"
     : "https://api.asaas.com/v3";
 }
@@ -34,11 +37,15 @@ function asaasErrorMessage(data: AsaasError, fallback: string): string {
   return data?.errors?.[0]?.description || fallback;
 }
 
-async function asaasFetch(path: string, init?: RequestInit): Promise<Response> {
-  return fetch(`${baseUrl()}${path}`, {
+async function asaasFetch(
+  creds: GatewayCredentials,
+  path: string,
+  init?: RequestInit
+): Promise<Response> {
+  return fetch(`${baseUrl(creds)}${path}`, {
     ...init,
     headers: {
-      access_token: serverEnv.asaasKey,
+      access_token: creds.apiKey ?? "",
       "Content-Type": "application/json",
       // Asaas pode bloquear requisições sem User-Agent.
       "User-Agent": "SeguidorX",
@@ -51,13 +58,14 @@ async function asaasFetch(path: string, init?: RequestInit): Promise<Response> {
 export const asaasGateway: PaymentGateway = {
   id: "asaas",
   label: "Asaas (PIX)",
+  requiresCpf: true,
 
-  isConfigured() {
-    return Boolean(serverEnv.asaasKey);
+  isConfigured(creds) {
+    return Boolean(creds.apiKey);
   },
 
-  async createPix(input: CreatePixInput): Promise<PixCharge> {
-    if (!serverEnv.asaasKey) throw new Error("Asaas não configurado.");
+  async createPix(input: CreatePixInput, creds: GatewayCredentials): Promise<PixCharge> {
+    if (!creds.apiKey) throw new Error("Asaas não configurado.");
 
     // 1) Cliente — reaproveita se já existir; senão cria (exige CPF/CNPJ).
     let customerId = input.asaasCustomerId || null;
@@ -65,7 +73,7 @@ export const asaasGateway: PaymentGateway = {
       const cpfCnpj = onlyDigits(input.payerCpfCnpj || "");
       if (!cpfCnpj) throw new Error("CPF/CNPJ é obrigatório para gerar o PIX.");
 
-      const res = await asaasFetch("/customers", {
+      const res = await asaasFetch(creds, "/customers", {
         method: "POST",
         body: JSON.stringify({
           name: input.payerName || input.payerEmail || "Cliente SeguidorX",
@@ -86,7 +94,7 @@ export const asaasGateway: PaymentGateway = {
 
     // 2) Cobrança PIX (vencimento hoje).
     const dueDate = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-    const payRes = await asaasFetch("/payments", {
+    const payRes = await asaasFetch(creds, "/payments", {
       method: "POST",
       body: JSON.stringify({
         customer: customerId,
@@ -108,7 +116,7 @@ export const asaasGateway: PaymentGateway = {
     }
 
     // 3) QR Code PIX (copia-e-cola + imagem base64).
-    const qrRes = await asaasFetch(`/payments/${payData.id}/pixQrCode`, {
+    const qrRes = await asaasFetch(creds, `/payments/${payData.id}/pixQrCode`, {
       method: "GET",
     });
     const qrData = (await qrRes.json()) as {
@@ -133,10 +141,11 @@ export const asaasGateway: PaymentGateway = {
 
   async parseWebhook(
     payload: unknown,
-    headers: Headers
+    headers: Headers,
+    creds: GatewayCredentials
   ): Promise<{ externalId: string; approved: boolean } | null> {
     // Validação do webhook: token configurado no painel do Asaas.
-    const secret = serverEnv.paymentWebhookSecret;
+    const secret = creds.webhookSecret;
     if (secret) {
       const token = headers.get("asaas-access-token") || "";
       if (token !== secret) return null; // requisição não autêntica -> ignora
@@ -157,5 +166,30 @@ export const asaasGateway: PaymentGateway = {
       (body.payment?.status ? PAID_STATUSES.includes(body.payment.status) : false);
 
     return { externalId: paymentId, approved };
+  },
+
+  async testConnection(creds: GatewayCredentials): Promise<GatewayTestResult> {
+    if (!creds.apiKey) return { ok: false, message: "Informe a chave de API." };
+    try {
+      const res = await asaasFetch(creds, "/myAccount", { method: "GET" });
+      const data = (await res.json()) as {
+        name?: string;
+        email?: string;
+        status?: string;
+      };
+      if (!res.ok) {
+        return { ok: false, message: `Chave inválida (HTTP ${res.status}).` };
+      }
+      const approved = data.status === "APPROVED";
+      return {
+        ok: true,
+        accountLabel: data.name || data.email || "Conta Asaas",
+        message: approved
+          ? "Conta aprovada"
+          : `Conta em status "${data.status ?? "?"}" — o PIX pode não estar liberado ainda.`,
+      };
+    } catch {
+      return { ok: false, message: "Falha ao conectar no Asaas." };
+    }
   },
 };

@@ -1,4 +1,4 @@
-/** Contrato de gateway de pagamento — permite trocar Asaas / outros / etc. */
+/** Contrato de gateway de pagamento — Asaas / Mercado Pago / mock. */
 
 export interface CreatePixInput {
   userId: string;
@@ -22,14 +22,37 @@ export interface PixCharge {
   customerId?: string | null;
 }
 
+/**
+ * Credenciais do gateway, carregadas do banco (tabela payment_gateways) —
+ * com fallback para variáveis de ambiente. NUNCA vão para o client.
+ */
+export interface GatewayCredentials {
+  apiKey?: string;
+  webhookSecret?: string;
+  env?: string; // asaas: "production" | "sandbox"
+  apiUrl?: string; // opcional: força a URL base
+}
+
+/** Resultado de um teste de conexão — só dados seguros de exibir no admin. */
+export interface GatewayTestResult {
+  ok: boolean;
+  accountLabel?: string; // nome/identificação da conta
+  message?: string;
+}
+
 export interface PaymentGateway {
   id: string;
   label: string;
-  isConfigured(): boolean;
-  createPix(input: CreatePixInput): Promise<PixCharge>;
+  /** Gateways que exigem CPF/CNPJ do pagador (Asaas). */
+  requiresCpf?: boolean;
+  isConfigured(creds: GatewayCredentials): boolean;
+  createPix(input: CreatePixInput, creds: GatewayCredentials): Promise<PixCharge>;
   /** Valida o webhook e devolve {externalId, approved} ou null se inválido. */
   parseWebhook(
     payload: unknown,
-    headers: Headers
+    headers: Headers,
+    creds: GatewayCredentials
   ): Promise<{ externalId: string; approved: boolean } | null>;
+  /** Valida as credenciais e devolve dados da conta para exibir no admin. */
+  testConnection(creds: GatewayCredentials): Promise<GatewayTestResult>;
 }

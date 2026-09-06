@@ -21,6 +21,9 @@ export const serverEnv = {
   asaasKey: process.env.ASAAS_API_KEY ?? "",
   asaasEnv: (process.env.ASAAS_ENV ?? "production").toLowerCase(),
   asaasApiUrl: process.env.ASAAS_API_URL ?? "",
+  // Mercado Pago (fallback do env; o preferido é conectar pelo admin).
+  mercadoPagoToken: process.env.MERCADOPAGO_ACCESS_TOKEN ?? "",
+  mercadoPagoWebhookSecret: process.env.MERCADOPAGO_WEBHOOK_SECRET ?? "",
 };
 
 export function isProviderConfigured(): boolean {

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, LogOut, Menu, X, Shield, ChevronDown } from "lucide-react";
+import { Plus, LogOut, Menu, X, Shield, ChevronDown, UserCog } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -138,6 +138,13 @@ export function AppShell({ children, name, email, balance, isAdmin, section }: P
                         <p className="truncate text-sm font-medium text-fg">{name}</p>
                         <p className="truncate text-xs text-fg-subtle">{email}</p>
                       </div>
+                      <Link
+                        href="/conta"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex w-full items-center gap-2 border-b border-border px-4 py-3 text-sm text-fg-muted hover:bg-surface-2 hover:text-fg"
+                      >
+                        <UserCog className="h-4 w-4" /> Conta
+                      </Link>
                       <button
                         onClick={handleSignOut}
                         className="flex w-full items-center gap-2 px-4 py-3 text-sm text-fg-muted hover:bg-surface-2 hover:text-fg"

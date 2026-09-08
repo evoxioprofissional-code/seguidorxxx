@@ -62,6 +62,8 @@ export async function getActiveServices(): Promise<PublicService[]> {
 
   return (data ?? [])
     .map((s) => s as Service)
+    // esconde "Outros" do catálogo (tanto plataforma quanto categoria)
+    .filter((s) => s.platform !== "outros" && s.category !== "outros")
     .filter((s) => !hasPricingWarning(s) && !s.pricing_warning)
     .map((s) => toPublic(s, tiers))
     .sort((a, b) => {

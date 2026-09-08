@@ -5,4 +5,4 @@
 -- ===========================================================================
 update public.profiles
 set role = 'admin'
-where email = 'b0redlowz@gmail.com';
+where email = 'rafacellcaicorn@gmail.com';

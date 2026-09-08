@@ -42,7 +42,7 @@ export default async function LandingPage() {
         <div className="relative mx-auto w-full max-w-5xl px-6">
           <p className="mb-6 flex items-center gap-2.5 text-sm text-fg-muted">
             <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            Feito pra quem cansou de painel ruim
+            Dê autoridade às suas redes sociais
           </p>
 
           <h1 className="display max-w-3xl text-[3.4rem] leading-[0.95] text-fg sm:text-[5rem] lg:text-[6.5rem]">
@@ -51,8 +51,27 @@ export default async function LandingPage() {
             <span className="text-primary">Sem enrolação.</span>
           </h1>
 
-          <p className="mt-8 max-w-xl text-lg leading-relaxed text-fg-muted">
-            Seguidores, curtidas e views de verdade — Instagram, TikTok, YouTube e mais.
+          <p className="mt-7 max-w-2xl text-base leading-relaxed sm:text-lg">
+            {[
+              "Seguidores",
+              "Curtidas",
+              "Engajamento",
+              "TikTok",
+              "Facebook",
+              "Instagram",
+              "YouTube",
+              "Kwai",
+              "Telegram",
+              "Twitter",
+            ].map((w, i) => (
+              <span key={w} className="whitespace-nowrap">
+                {i > 0 && <span className="mx-2 text-primary/70">/</span>}
+                <span className="text-fg">{w}</span>
+              </span>
+            ))}
+          </p>
+
+          <p className="mt-5 max-w-xl leading-relaxed text-fg-muted">
             Paga no Pix, entra na hora, você acompanha tudo.
           </p>
 

@@ -13,6 +13,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
   const params = useSearchParams();
   const redirectTo = params.get("redirect") || "/dashboard";
+  const ref = params.get("ref") || "";
 
   const action = mode === "login" ? signInAction : signUpAction;
   const [state, formAction, pending] = useActionState<AuthResult, FormData>(
@@ -41,6 +42,12 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       </p>
 
       <form action={formAction} className="mt-7 space-y-4">
+        {mode === "signup" && ref && <input type="hidden" name="ref" value={ref} />}
+        {mode === "signup" && ref && (
+          <p className="rounded-lg border border-primary/25 bg-primary/10 px-3 py-2 text-xs text-primary-soft">
+            Você foi indicado por um amigo — bem-vindo!
+          </p>
+        )}
         {mode === "signup" && (
           <Input
             name="name"

@@ -34,6 +34,9 @@ export default async function AdminSettingsPage() {
           announcement_message: String(ann.message ?? ""),
           bonus_enabled: Boolean(s.bonus_enabled ?? true),
           bonus_tiers: tiers.length ? tiers : [{ min: 30, followers: 1000 }],
+          referral_enabled: Boolean(s.referral_enabled ?? true),
+          referral_commission_percentage: Number(s.referral_commission_percentage ?? 10),
+          referral_min_deposit: Number(s.referral_min_deposit ?? 0),
         }}
       />
     </div>

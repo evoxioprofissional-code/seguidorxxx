@@ -43,5 +43,13 @@ export async function approvePaymentByExternalId(
     /* bônus é best-effort */
   }
 
+  // comissão de indicação para quem indicou este usuário. best-effort.
+  try {
+    const { payReferralCommission } = await import("@/lib/referral");
+    await payReferralCommission(payment.id);
+  } catch {
+    /* indicação é best-effort */
+  }
+
   return { ok: true };
 }

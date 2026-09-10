@@ -13,7 +13,7 @@ export type OrderStatus =
   | "canceled"
   | "failed"
   | "refunded";
-export type TxType = "deposit" | "purchase" | "refund" | "adjustment";
+export type TxType = "deposit" | "purchase" | "refund" | "adjustment" | "referral";
 export type PaymentStatus =
   | "pending"
   | "approved"
@@ -31,6 +31,8 @@ export type Profile = {
   status: "active" | "blocked";
   cpf_cnpj: string | null;
   asaas_customer_id: string | null;
+  referral_code: string | null;
+  referred_by: string | null;
   created_at: string;
   updated_at: string;
 }

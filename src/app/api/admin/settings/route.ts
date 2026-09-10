@@ -13,6 +13,9 @@ const ALLOWED = [
   "speed_tiers",
   "bonus_enabled",
   "deposit_bonuses",
+  "referral_enabled",
+  "referral_commission_percentage",
+  "referral_min_deposit",
 ];
 
 export async function PATCH(request: Request) {

@@ -43,12 +43,29 @@ export async function signUpAction(
   }
 
   const whatsapp = onlyDigits(parsed.data.whatsapp);
+
+  // indicação: descobre quem indicou pelo código do link (?ref=CODE)
+  let referredBy: string | null = null;
+  const refCode = String(formData.get("ref") || "").trim().toUpperCase();
+  if (refCode) {
+    try {
+      const { data: refUser } = await createAdminClient()
+        .from("profiles")
+        .select("id")
+        .eq("referral_code", refCode)
+        .maybeSingle();
+      if (refUser) referredBy = refUser.id;
+    } catch {
+      /* código inválido — segue sem indicação */
+    }
+  }
+
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
-      data: { name: parsed.data.name, whatsapp },
+      data: { name: parsed.data.name, whatsapp, referred_by: referredBy ?? "" },
     },
   });
 

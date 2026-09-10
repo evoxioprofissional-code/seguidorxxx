@@ -10,6 +10,7 @@ import {
   Code2,
   Zap,
   CreditCard,
+  Gift,
   type LucideIcon,
 } from "lucide-react";
 
@@ -24,6 +25,7 @@ export const userNav: NavItem[] = [
   { href: "/services", label: "Comprar", icon: ShoppingBag },
   { href: "/orders", label: "Pedidos", icon: ListOrdered },
   { href: "/wallet", label: "Carteira", icon: Wallet },
+  { href: "/indicacao", label: "Indicar", icon: Gift },
   { href: "/integracao", label: "API", icon: Code2 },
 ];
 

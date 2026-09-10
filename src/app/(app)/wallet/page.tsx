@@ -15,6 +15,7 @@ const TX_LABEL: Record<string, string> = {
   purchase: "Compra",
   refund: "Reembolso",
   adjustment: "Ajuste",
+  referral: "Indicação",
 };
 
 export default async function WalletPage() {

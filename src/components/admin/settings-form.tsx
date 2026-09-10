@@ -18,6 +18,9 @@ interface Settings {
   announcement_message: string;
   bonus_enabled: boolean;
   bonus_tiers: { min: number; followers: number }[];
+  referral_enabled: boolean;
+  referral_commission_percentage: number;
+  referral_min_deposit: number;
 }
 
 export function SettingsForm({ initial }: { initial: Settings }) {
@@ -51,6 +54,9 @@ export function SettingsForm({ initial }: { initial: Settings }) {
           deposit_bonuses: form.bonus_tiers
             .map((t) => ({ min: Number(t.min), followers: Number(t.followers) }))
             .filter((t) => t.min > 0 && t.followers > 0),
+          referral_enabled: form.referral_enabled,
+          referral_commission_percentage: Number(form.referral_commission_percentage),
+          referral_min_deposit: Number(form.referral_min_deposit),
         }),
       });
       if (res.ok) {
@@ -202,6 +208,49 @@ export function SettingsForm({ initial }: { initial: Settings }) {
           >
             + Adicionar faixa
           </button>
+        </div>
+      </div>
+
+      {/* Indicação (referral) */}
+      <div className="card p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold">Programa de indicação</h2>
+            <p className="text-sm text-fg-muted">
+              Cliente indica pelo link e ganha % de cada depósito do indicado.
+            </p>
+          </div>
+          <button
+            onClick={() => set("referral_enabled", !form.referral_enabled)}
+            className={
+              "relative h-6 w-11 shrink-0 rounded-full transition-colors " +
+              (form.referral_enabled ? "bg-primary" : "bg-surface-3")
+            }
+          >
+            <span
+              className={
+                "absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform " +
+                (form.referral_enabled ? "translate-x-5" : "translate-x-0.5")
+              }
+            />
+          </button>
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <Input
+            label="Comissão por depósito (%)"
+            type="number"
+            value={form.referral_commission_percentage}
+            onChange={(e) => set("referral_commission_percentage", Number(e.target.value))}
+            hint="Ex.: 10 = o indicador ganha 10% de cada depósito do indicado."
+          />
+          <Input
+            label="Depósito mínimo p/ comissão (R$)"
+            type="number"
+            value={form.referral_min_deposit}
+            onChange={(e) => set("referral_min_deposit", Number(e.target.value))}
+            hint="0 = qualquer depósito conta."
+          />
         </div>
       </div>
 

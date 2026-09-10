@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Bricolage_Grotesque } from "next/font/google";
 import { Toaster } from "sonner";
+import { WhatsAppFab } from "@/components/support/whatsapp-fab";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col bg-bg text-fg">
         {children}
+        <WhatsAppFab />
         <Toaster
           theme="dark"
           position="top-right"

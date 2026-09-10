@@ -84,9 +84,10 @@ export const mercadoPagoGateway: PaymentGateway = {
     const paymentId = body.data?.id != null ? String(body.data.id) : null;
     const topic = body.type || body.action || "";
     if (!paymentId || !topic.includes("payment")) return null;
+    if (!secret) return null;
 
     // Validação de assinatura (x-signature: ts=...,v1=...)
-    if (secret) {
+    {
       const sig = headers.get("x-signature") || "";
       const requestId = headers.get("x-request-id") || "";
       let ts = "";

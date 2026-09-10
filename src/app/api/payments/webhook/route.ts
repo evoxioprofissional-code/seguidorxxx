@@ -7,7 +7,12 @@ import { approvePaymentByExternalId } from "@/lib/payments/approve";
  * O gateway valida a assinatura em parseWebhook(). Só credita saldo aqui.
  */
 export async function POST(request: Request) {
-  const { gateway, creds } = await getActiveGateway();
+  const { gateway, creds, providerId } = await getActiveGateway();
+
+  if (providerId !== "mock" && !creds.webhookSecret) {
+    console.error("[payments] webhook sem segredo configurado", { providerId });
+    return NextResponse.json({ received: false }, { status: 500 });
+  }
 
   let payload: unknown;
   try {
@@ -23,7 +28,14 @@ export async function POST(request: Request) {
   }
 
   if (parsed.approved) {
-    await approvePaymentByExternalId(parsed.externalId);
+    const result = await approvePaymentByExternalId(parsed.externalId);
+    if (!result.ok) {
+      console.error("[payments] aprovação incompleta:", {
+        externalId: parsed.externalId,
+        reason: result.reason,
+      });
+      return NextResponse.json({ received: false }, { status: 500 });
+    }
   }
 
   return NextResponse.json({ received: true });

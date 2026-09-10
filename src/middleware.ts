@@ -1,8 +1,22 @@
 import { type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
+import { normalizeReferralCode, REFERRAL_COOKIE } from "@/lib/referral-code";
 
 export async function middleware(request: NextRequest) {
-  return updateSession(request);
+  const response = await updateSession(request);
+  const referralCode = normalizeReferralCode(request.nextUrl.searchParams.get("ref"));
+
+  if (referralCode) {
+    response.cookies.set(REFERRAL_COOKIE, referralCode, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+    });
+  }
+
+  return response;
 }
 
 export const config = {

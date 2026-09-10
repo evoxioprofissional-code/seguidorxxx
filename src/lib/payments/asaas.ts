@@ -146,10 +146,9 @@ export const asaasGateway: PaymentGateway = {
   ): Promise<{ externalId: string; approved: boolean } | null> {
     // Validação do webhook: token configurado no painel do Asaas.
     const secret = creds.webhookSecret;
-    if (secret) {
-      const token = headers.get("asaas-access-token") || "";
-      if (token !== secret) return null; // requisição não autêntica -> ignora
-    }
+    if (!secret) return null;
+    const token = headers.get("asaas-access-token") || "";
+    if (token !== secret) return null;
 
     const body = (payload ?? {}) as {
       event?: string;

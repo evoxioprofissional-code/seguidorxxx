@@ -17,19 +17,10 @@ export default async function IndicacaoPage() {
   const enabled = settings.referral_enabled !== false;
   const pct = Number(settings.referral_commission_percentage ?? 0);
 
-  const [{ count: referredCount }, { data: earnings }] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("*", { count: "exact", head: true })
-      .eq("referred_by", profile.id),
-    supabase
-      .from("wallet_transactions")
-      .select("amount")
-      .eq("user_id", profile.id)
-      .eq("type", "referral"),
-  ]);
-
-  const totalEarned = (earnings ?? []).reduce((s, t) => s + Number(t.amount), 0);
+  const { data: stats, error: statsError } = await supabase.rpc("get_my_referral_stats");
+  const row = stats?.[0];
+  const referredCount = Number(row?.referred_count ?? 0);
+  const totalEarned = Number(row?.total_earned ?? 0);
   const base = (publicEnv.appUrl || "").replace(/\/$/, "");
   const link = `${base}/cadastro?ref=${profile.referral_code ?? ""}`;
 
@@ -41,6 +32,12 @@ export default async function IndicacaoPage() {
           Compartilhe seu link. Cada pessoa que se cadastrar e depositar te rende comissão.
         </p>
       </div>
+
+      {statsError && (
+        <div className="rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger">
+          Não foi possível carregar seus dados de indicação. Tente novamente em instantes.
+        </div>
+      )}
 
       {!enabled ? (
         <div className="card p-6 text-sm text-fg-muted">

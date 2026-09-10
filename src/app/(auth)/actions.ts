@@ -1,9 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { loginSchema, signupSchema, onlyDigits } from "@/lib/validations";
+import { claimReferralByCode } from "@/lib/referral";
+import { normalizeReferralCode, REFERRAL_COOKIE } from "@/lib/referral-code";
 
 export type AuthResult = { error?: string; success?: boolean };
 
@@ -44,28 +47,17 @@ export async function signUpAction(
 
   const whatsapp = onlyDigits(parsed.data.whatsapp);
 
-  // indicação: descobre quem indicou pelo código do link (?ref=CODE)
-  let referredBy: string | null = null;
-  const refCode = String(formData.get("ref") || "").trim().toUpperCase();
-  if (refCode) {
-    try {
-      const { data: refUser } = await createAdminClient()
-        .from("profiles")
-        .select("id")
-        .eq("referral_code", refCode)
-        .maybeSingle();
-      if (refUser) referredBy = refUser.id;
-    } catch {
-      /* código inválido — segue sem indicação */
-    }
-  }
-
+  // O código também pode vir do cookie, caso o usuário tenha navegado antes.
+  const cookieStore = await cookies();
+  const refCode = normalizeReferralCode(
+    String(formData.get("ref") || "") || cookieStore.get(REFERRAL_COOKIE)?.value
+  );
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
-      data: { name: parsed.data.name, whatsapp, referred_by: referredBy ?? "" },
+      data: { name: parsed.data.name, whatsapp, referral_code: refCode },
     },
   });
 
@@ -82,8 +74,13 @@ export async function signUpAction(
         .from("profiles")
         .update({ whatsapp })
         .eq("id", data.user.id);
+
+      if (refCode) {
+        await claimReferralByCode(data.user.id, refCode);
+        cookieStore.delete(REFERRAL_COOKIE);
+      }
     } catch {
-      /* best-effort: se a coluna ainda não existir, o cadastro segue normal */
+      /* o trigger já tenta criar o vínculo; não bloqueia o cadastro */
     }
   }
 

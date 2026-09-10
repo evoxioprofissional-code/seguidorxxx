@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "test:referral": "node --experimental-strip-types --test scripts/referral-code.test.mjs",
     "start": "next start",
     "lint": "eslint"
   },

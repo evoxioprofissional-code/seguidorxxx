@@ -18,7 +18,16 @@ export async function approvePaymentByExternalId(
     .single();
 
   if (!payment) return { ok: false, reason: "not_found" };
-  if (payment.status === "approved") return { ok: true }; // idempotente
+  if (payment.status === "approved") {
+    try {
+      const { payReferralCommission } = await import("@/lib/referral");
+      await payReferralCommission(payment.id);
+      return { ok: true };
+    } catch (error) {
+      console.error("[referral] retry de comissão falhou:", error);
+      return { ok: false, reason: "referral_failed" };
+    }
+  }
 
   // credita saldo (RPC idempotente por reference_id + type=deposit)
   const { error: creditErr } = await admin.rpc("credit_balance", {
@@ -30,10 +39,11 @@ export async function approvePaymentByExternalId(
   });
   if (creditErr) return { ok: false, reason: creditErr.message };
 
-  await admin
+  const { error: paymentUpdateError } = await admin
     .from("payments")
     .update({ status: "approved", approved_at: new Date().toISOString() })
     .eq("id", payment.id);
+  if (paymentUpdateError) return { ok: false, reason: paymentUpdateError.message };
 
   // bônus por depósito (grátis seguidores). best-effort, não bloqueia o crédito.
   try {
@@ -43,12 +53,13 @@ export async function approvePaymentByExternalId(
     /* bônus é best-effort */
   }
 
-  // comissão de indicação para quem indicou este usuário. best-effort.
+  // Comissão é financeira: falhas precisam provocar retry do webhook.
   try {
     const { payReferralCommission } = await import("@/lib/referral");
     await payReferralCommission(payment.id);
-  } catch {
-    /* indicação é best-effort */
+  } catch (error) {
+    console.error("[referral] comissão falhou:", error);
+    return { ok: false, reason: "referral_failed" };
   }
 
   return { ok: true };

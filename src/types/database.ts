@@ -207,6 +207,17 @@ export type BonusGrant = {
   delivered_at: string | null;
 }
 
+export type ReferralCommission = {
+  id: string;
+  payment_id: string;
+  referrer_id: string;
+  referred_id: string;
+  deposit_amount: number;
+  percentage: number;
+  amount: number;
+  created_at: string;
+}
+
 type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
   Row: Row;
   Insert: Insert;
@@ -231,6 +242,7 @@ export type Database = {
       bonus_grants: Table<BonusGrant>;
       payment_gateways: Table<PaymentGatewayRow>;
       provider_settings: Table<ProviderSettingRow>;
+      referral_commissions: Table<ReferralCommission>;
     };
     Views: Record<string, never>;
     Functions: {
@@ -238,6 +250,18 @@ export type Database = {
       create_order_and_debit: { Args: Record<string, unknown>; Returns: Order };
       refund_order: { Args: Record<string, unknown>; Returns: Order };
       credit_balance: { Args: Record<string, unknown>; Returns: number };
+      claim_referral: {
+        Args: { p_user_id: string; p_referral_code: string };
+        Returns: boolean;
+      };
+      process_referral_commission: {
+        Args: { p_payment_id: string };
+        Returns: number;
+      };
+      get_my_referral_stats: {
+        Args: Record<string, never>;
+        Returns: { referred_count: number; total_earned: number }[];
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

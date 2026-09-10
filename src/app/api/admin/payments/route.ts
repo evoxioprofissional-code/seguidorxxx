@@ -83,6 +83,11 @@ export async function POST(request: Request) {
 
   if (!apiKey)
     return NextResponse.json({ error: "Informe a chave de API." }, { status: 400 });
+  if (!webhookSecret)
+    return NextResponse.json(
+      { error: "Informe o token/segredo do webhook para receber pagamentos com segurança." },
+      { status: 400 }
+    );
 
   const test = await gateway.testConnection(creds);
 

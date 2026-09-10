@@ -32,6 +32,11 @@ export async function POST(request: Request) {
         { error: "Conecte o gateway antes de ativá-lo." },
         { status: 400 }
       );
+    if (!creds.webhookSecret)
+      return NextResponse.json(
+        { error: "Configure o token/segredo do webhook antes de ativar." },
+        { status: 400 }
+      );
   }
 
   await setActiveProviderId(id);

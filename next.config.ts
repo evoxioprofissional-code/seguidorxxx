@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 import path from "node:path";
 
 const nextConfig: NextConfig = {
-  // Evita que o Turbopack suba a raiz até o diretório home (package-lock.json solto).
+  agentRules: false,
   turbopack: {
     root: path.join(__dirname),
   },

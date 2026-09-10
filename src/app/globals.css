@@ -71,7 +71,7 @@
   --font-display: var(--font-display), var(--font-geist-sans), sans-serif;
 }
 
-/* Fonte de display — títulos com caráter (não a genérica de IA) */
+/* Fonte de display para títulos */
 .display {
   font-family: var(--font-display), var(--font-geist-sans), sans-serif;
   letter-spacing: -0.03em;
@@ -135,7 +135,7 @@ h3 {
   box-shadow: var(--shadow-lg);
 }
 
-/* compat: .text-gradient antigo vira cor sólida (sem gradiente-texto de IA) */
+/* .text-gradient: cor sólida de destaque */
 .text-gradient {
   color: var(--primary);
 }

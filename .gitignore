@@ -43,3 +43,8 @@ next-env.d.ts
 
 # scripts temporários (podem conter segredos)
 scripts/_*
+
+# arquivos de assistente/agente
+AGENTS.md
+CLAUDE.md
+.claude/

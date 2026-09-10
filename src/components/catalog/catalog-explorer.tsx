@@ -245,7 +245,17 @@ export function CatalogExplorer({
               >
                 <PlatformIcon platform={svc.platform} size={44} />
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium text-fg">{svc.name}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-fg">{svc.name}</p>
+                    <span className="shrink-0 rounded-md border border-border bg-surface-2 px-1.5 py-0.5 font-mono text-[11px] text-fg-subtle">
+                      ID {svc.code}
+                    </span>
+                  </div>
+                  {svc.description && (
+                    <p className="mt-1 text-sm leading-snug text-fg-muted line-clamp-2">
+                      {svc.description}
+                    </p>
+                  )}
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
                     {svc.speedLabel ? (
                       <Badge color="success">
@@ -300,9 +310,14 @@ export function CatalogExplorer({
               <div className="flex items-start gap-3 border-b border-border p-5">
                 <PlatformIcon platform={selected.platform} size={44} />
                 <div className="flex-1">
-                  <h3 className="font-semibold text-fg">{selected.name}</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-fg">{selected.name}</h3>
+                    <span className="shrink-0 rounded-md border border-border bg-surface-2 px-1.5 py-0.5 font-mono text-[11px] text-fg-subtle">
+                      ID {selected.code}
+                    </span>
+                  </div>
                   {selected.description && (
-                    <p className="mt-0.5 text-sm text-fg-muted">{selected.description}</p>
+                    <p className="mt-1 whitespace-pre-line text-sm text-fg-muted">{selected.description}</p>
                   )}
                 </div>
               </div>

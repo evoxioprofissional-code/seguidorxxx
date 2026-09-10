@@ -14,6 +14,7 @@ export interface SpeedTier {
 /** DTO seguro — NUNCA expõe custo, lucro, fornecedor ou id do fornecedor. */
 export interface PublicService {
   id: string;
+  code: number;
   name: string;
   description: string | null;
   platform: string;
@@ -34,6 +35,7 @@ function toPublic(s: Service, tiers: SpeedTier[]): PublicService {
   const tier = tiers.find((t) => t.ids.includes(String(s.provider_service_id)));
   return {
     id: s.id,
+    code: s.code,
     name: s.custom_name || `${categoryLabel(s.category)} ${platformLabel(s.platform)}`,
     description: s.custom_description,
     platform: s.platform || "outros",
